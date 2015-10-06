@@ -1,0 +1,259 @@
+#!/usr/bin/env php
+<?php
+/**
+ *  Cider
+ *
+ *  Cider is a PHP based object oriented nano-framework for building small web applications.
+ *
+ *  @author Carbin Creative <hej@carbin.se>
+ *  @license http://opensource.org/licenses/MIT MIT
+ */
+
+/* @namespace Shell */
+namespace Cider\Shell;
+
+/* @imports */
+use RegexIterator;
+use RecursiveRegexIterator;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+
+
+/**
+ *  @const string CIDER_ROOT_PATH
+ */
+define('CIDER_ROOT_PATH', implode(DIRECTORY_SEPARATOR, [__DIR__, '..']) . DIRECTORY_SEPARATOR);
+
+/**
+ *  @polyfill
+ *  @const stream STDIN
+ */
+defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
+
+/**
+ *  @polyfill
+ *  @const stream STDOUT
+ */
+defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
+
+/**
+ *  send
+ *
+ *  Sends data to I/O stream.
+ *
+ *  @param string
+ *  @param string $prefix
+ *  @param string $suffix
+ *
+ *  @return void
+ */
+function send(String $data, String $prefix = null, String $suffix = null) {
+
+  fputs(STDOUT, implode([$prefix, trim($data, "\n"), "\n", $suffix]));
+
+}
+
+/**
+ *  fetch
+ *
+ *  Gets data from I/O stream.
+ *
+ *  @return string
+ */
+function fetch(Int $streamLength = 1024):String {
+
+  return trim(fgets(STDIN, $streamLength), "\n");
+
+}
+
+/**
+ *  argv
+ *
+ *  Gets input argument based on index from $argv.
+ *
+ *  @param int $argumentIndex
+ *
+ *  @return string
+ */
+function argv(Int $argumentIndex = 1):String {
+
+  global $argv;
+
+  return $argv[$argumentIndex];
+
+}
+
+/**
+ *  tell
+ *
+ *  Prints a Cider console message.
+ *
+ *  @param string $message
+ *  @param mixed $replacements, ...
+ */
+function tell(String $message, ...$replacements) {
+
+  send(sprintf("\033[\033[1;36mCider\033[0m: %s", sprintf($message, ...$replacements)));
+
+}
+
+/**
+ *  getAllSpecFiles
+ *
+ *  Returns an array of paths to all spec tests in <CIDER_ROOT_PATH>/specs/
+ *
+ *  @return array
+ */
+function getAllSpecFiles():Array {
+
+  $specIncludePath = implode(DIRECTORY_SEPARATOR, [CIDER_ROOT_PATH, 'specs']);
+
+  $regexDirectoryIterator = new RegexIterator(
+    new RecursiveIteratorIterator(
+      new RecursiveDirectoryIterator($specIncludePath)
+    ),
+    '/^.+Spec\.php$/i',
+    RecursiveRegexIterator::GET_MATCH
+  );
+
+  $includePaths = array_keys(iterator_to_array($regexDirectoryIterator));
+
+  return $includePaths;
+
+}
+
+/**
+ *  loadAllSpecFiles
+ *
+ *  Loads all spec tests in <CIDER_ROOT_PATH>/specs/ using {@see getAllSpecFiles} and returns number of test files loaded.
+ *
+ *  @return int
+ */
+function loadAllSpecFiles():Int {
+
+  $specIncludePaths = getAllSpecFiles();
+
+  foreach($specIncludePaths as $includePath) {
+
+    require_once $includePath;
+
+  }
+
+  return count($specIncludePaths);
+
+}
+
+/**
+ *  Run!
+ */
+error_reporting(E_ALL ^ E_NOTICE);
+
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/FrameworkException.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/BadMethodCallException.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/OverflowException.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Event/Emitter.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Expectation.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Spec.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Runner.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Helpers.php';
+
+$allTestsPassed = true;
+
+try {
+
+  $command = argv();
+
+  switch($command) {
+
+    case 'test' :
+
+      $numTests = loadAllSpecFiles();
+
+      $exitCode = 0;
+
+      tell('Waiting for %d tests...', $numTests);
+
+      $specRunner = \Cider\Spec\currentRunner();
+
+      $specRunner->runAll();
+
+      $specReport = (object) $specRunner->report();
+
+      foreach($specReport->specs as $specDescription => $specTestReport) {
+
+        $specTestReport = (object) $specTestReport;
+
+        if($specTestReport->skipped === true) {
+
+          $specDescriptionTitle = sprintf("  [\033[\033[1;34m%s\033[0m] Spec %s", 'SKIP', $specDescription);
+
+        } else if($specTestReport->passed === true) {
+
+          $specDescriptionTitle = sprintf("  [\033[\033[1;32m%s\033[0m] Spec %s", 'PASS', $specDescription);
+
+        } if($specTestReport->failed === true) {
+
+          $specDescriptionTitle = sprintf("  [\033[\033[1;31m%s\033[0m] Spec %s", 'FAIL', $specDescription);
+
+          $allTestsPassed = false;
+
+          $exitCode = 1;
+
+        }
+
+        $specDescriptionTitle .= sprintf(" (\033[\033[1;33m%s\033[0m ms)", round($specTestReport->timeElapsed * 1000, 6));
+
+        send($specDescriptionTitle, "\n", "\n");
+
+        foreach($specTestReport->tests as $testReport) {
+
+          list($testState, $testDescription) = $testReport;
+
+          switch(strtolower($testState)) {
+
+            case 'pass' :
+
+              send(sprintf("    \033[\033[1;32m%s\033[0m  %s", '✔', $testDescription));
+
+            break;
+            case 'fail' :
+
+              send(sprintf("    \033[\033[1;31m%s\033[0m  %s", '✘', $testDescription));
+
+            break;
+            case 'skip' :
+
+              send(sprintf("    \033[\033[1;34m%s\033[0m  %s", '▸', $testDescription));
+
+            break;
+
+          }
+
+        }
+
+        send("");
+
+      }
+
+    break;
+
+  }
+
+} catch (\Exception $e) {
+
+  send($e->getMessage());
+  exit(1);
+
+} finally {
+
+  if($allTestsPassed) {
+
+    exit(0);
+
+  } else {
+
+    exit(1);
+
+  }
+
+}
