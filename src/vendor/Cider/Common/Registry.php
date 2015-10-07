@@ -14,9 +14,6 @@ namespace Cider\Common;
 /* Deny direct file access */
 if(!defined('CIDER_ROOT_PATH')) exit;
 
-/* @imports */
-use Countable;
-
 /**
  *  Registry
  *
@@ -29,7 +26,7 @@ use Countable;
  *
  *  @author Carbin Creative <hej@carbin.se>
  */
-trait Registry implements Countable {
+trait Registry {
 
   /**
    *  @var array $__store
@@ -108,15 +105,15 @@ trait Registry implements Countable {
   }
 
   /**
-   *  count
+   *  size
    *
    *  Returns size of {@see \Cider\Common\Registry::$__store}.
    *
    *  @return int
    */
-  public function count():Int {
+  public function size():Int {
 
-    return count($this->__store):
+    return count($this->__store);
 
   }
 
