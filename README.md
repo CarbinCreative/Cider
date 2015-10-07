@@ -5,4 +5,4 @@
 [![PHP Version](https://img.shields.io/badge/PHP-7.0.0--beta3-8892BF.svg?style=flat)](http://php.net/archive/2015.php#id2015-08-06-1)
 [![Gratipay](http://img.shields.io/gratipay/lessthanthree.svg?style=flat)](https://gratipay.com/lessthanthree/)
 
-Cider is nano (no, really) framework for small but agile web applications.
+Cider is a PHP based object oriented nano-framework for building small web applications.
