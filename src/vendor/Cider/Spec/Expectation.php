@@ -50,6 +50,23 @@ class Expectation {
   }
 
   /**
+   *  expect
+   *
+   *  Sets and returns new instance of {@see \Cider\Spec\Expectation}.
+   *
+   *  @param mixed $actual
+   *
+   *  @return \Cider\Spec\Expectation
+   */
+  protected function expect($actual):self {
+
+    $newInstance = new self($actual);
+
+    return $newInstance;
+
+  }
+
+  /**
    *  toEqual
    *
    *  Expect actual to be exact match to expected.
@@ -130,17 +147,17 @@ class Expectation {
    */
   public function toEqualAll(...$expectations):Bool {
 
-    $matchedExpectations = [];
-
     foreach($expectations as $expected) {
 
-      $matchedExpectations[] = $this->toEqual($expected);
+      if($this->notToEqual($expected) === true) {
+
+        return false;
+
+      }
 
     }
 
-    $matchedExpectations = array_unique($matchedExpectations);
-
-    return (count($matchedExpectations) === 1);
+    return true;
 
   }
 
@@ -194,9 +211,63 @@ class Expectation {
    *
    *  @return bool
    */
-  public function toSatisfy(Callable $callback):Bool {
+  public function toSatisfy(Callable $callback, ...$callbackArguments):Bool {
 
-    return call_user_func($callback, $this->actual) === true;
+    return call_user_func_array($callback, [$this->actual] + $callbackArguments) === true;
+
+  }
+
+  /**
+   *  instanceOf
+   *
+   *  Expects actual to be instance of expected.
+   *
+   *  @param string $expected
+   *
+   *  @return bool
+   */
+  public function instanceOf($expected):Bool {
+
+    return is_a($this->actual, $expected);
+
+  }
+
+  /**
+   *  typeOf
+   *
+   *  Expects actual to be type of expected.
+   *
+   *  @param string $expected
+   *
+   *  @return bool
+   */
+  public function typeOf(String $expected):Bool {
+
+    $validObjectTypes = [
+      'array',
+      'bool',
+      'callable',
+      'double',
+      'float',
+      'int',
+      'integer',
+      'long',
+      'null',
+      'numeric',
+      'object',
+      'real',
+      'resource',
+      'scalar',
+      'string'
+    ];
+
+    if($this->expect($expected)->toEqualAny(...$validObjectTypes) === true) {
+
+      return $this->toSatisfy("is_{$expected}");
+
+    }
+
+    return false;
 
   }
 
