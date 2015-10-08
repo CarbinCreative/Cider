@@ -50,6 +50,16 @@ class Spec {
   protected $after;
 
   /**
+   *  @var callable $beforeEach
+   */
+  protected $beforeEach;
+
+  /**
+   *  @var callable $afterEach
+   */
+  protected $afterEach;
+
+  /**
    *  @var string $description
    */
   protected $description;
@@ -111,6 +121,36 @@ class Spec {
   public function after(Callable $afterCallback) {
 
     $this->after = $afterCallback;
+
+  }
+
+  /**
+   *  beforeEach
+   *
+   *  Adds a callback that is called before a spec is run.
+   *
+   *  @param callable $beforeEachCallback
+   *
+   *  @return void
+   */
+  public function beforeEach(Callable $beforeEachCallback) {
+
+    $this->beforeEach = $beforeEachCallback;
+
+  }
+
+  /**
+   *  afterEach
+   *
+   *  Adds a callback that is called after a spec is run.
+   *
+   *  @param callable $afterEachCallback
+   *
+   *  @return void
+   */
+  public function afterEach(Callable $afterEachCallback) {
+
+    $this->afterEach = $afterEachCallback;
 
   }
 
@@ -333,6 +373,12 @@ class Spec {
 
       foreach($this->tests as $testDescription => $testCallback) {
 
+        if(is_callable($this->beforeEach) === true) {
+
+          call_user_func($this->beforeEach);
+
+        }
+
         $testCallbackResult = call_user_func($testCallback);
 
         if($testCallbackResult === true) {
@@ -352,6 +398,12 @@ class Spec {
           $this->skip($testDescription);
 
           $specReport[$testDescription] = ['skip', $testDescription];
+
+        }
+
+        if(is_callable($this->afterEach) === true) {
+
+          call_user_func($this->afterEach);
 
         }
 

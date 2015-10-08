@@ -31,6 +31,9 @@ $outputBuffer = null;
 /* Run the application */
 try {
 
+  /* Load version file */
+  require_once CIDER_ROOT_PATH . 'version.php';
+
   /* Load Cider bootstrap */
   require_once implode(DIRECTORY_SEPARATOR, [
     rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR),
@@ -47,7 +50,7 @@ try {
 
   $outputBuffer = ob_get_clean();
 
-  echo 'Cider 1.0.0';
+  echo 'Cider ' . CIDER_VERSION;
 
 } catch (FrameworkException $exception) {
 

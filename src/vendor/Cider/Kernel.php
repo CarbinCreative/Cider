@@ -28,9 +28,9 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  */
 class Kernel {
 
-  /* @uses */
+  /* @mixins */
   use Common\Singleton;
-  use Common\Registry;
+  use Common\Mutable;
   use Common\Factory;
   use Event\Emitter;
 

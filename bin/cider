@@ -18,6 +18,10 @@ use RecursiveRegexIterator;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 
+/**
+ *  @const string NAMESPACE_SEPARATOR
+ */
+define('NAMESPACE_SEPARATOR', '\\');
 
 /**
  *  @const string CIDER_ROOT_PATH
@@ -98,68 +102,21 @@ function tell(String $message, ...$replacements) {
 }
 
 /**
- *  getAllSpecFiles
- *
- *  Returns an array of paths to all spec tests in <CIDER_ROOT_PATH>/specs/
- *
- *  @return array
- */
-function getAllSpecFiles():Array {
-
-  $specIncludePath = implode(DIRECTORY_SEPARATOR, [CIDER_ROOT_PATH, 'specs']);
-
-  $regexDirectoryIterator = new RegexIterator(
-    new RecursiveIteratorIterator(
-      new RecursiveDirectoryIterator($specIncludePath)
-    ),
-    '/^.+Spec\.php$/i',
-    RecursiveRegexIterator::GET_MATCH
-  );
-
-  $includePaths = array_keys(iterator_to_array($regexDirectoryIterator));
-
-  return $includePaths;
-
-}
-
-/**
- *  loadAllSpecFiles
- *
- *  Loads all spec tests in <CIDER_ROOT_PATH>/specs/ using {@see getAllSpecFiles} and returns number of test files loaded.
- *
- *  @return int
- */
-function loadAllSpecFiles():Int {
-
-  $specIncludePaths = getAllSpecFiles();
-
-  foreach($specIncludePaths as $includePath) {
-
-    require_once $includePath;
-
-  }
-
-  return count($specIncludePaths);
-
-}
-
-/**
  *  Run!
  */
 error_reporting(E_ALL ^ E_NOTICE);
 
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/FrameworkException.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/BadMethodCallException.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/OverflowException.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Event/Emitter.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Expectation.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Spec.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Runner.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Spec/Helpers.php';
+require_once CIDER_ROOT_PATH . 'src/vendor/Cider/functions.php';
+
+\Cider\import('Cider\Exceptions\*');
+\Cider\import('Cider\Common\*');
+\Cider\import('Cider\Event\Emitter');
+\Cider\import('Cider\Spec\*');
+\Cider\import('Cider\Spec\helpers');
 
 $allTestsPassed = true;
 
-try {
+//try {
 
   $command = argv();
 
@@ -167,17 +124,15 @@ try {
 
     case 'test' :
 
-      $numTests = loadAllSpecFiles();
+      $numTests = \Cider\import('*', 'specs');
 
       $exitCode = 0;
 
       tell('Waiting for %d tests...', $numTests);
 
-      $specRunner = \Cider\Spec\currentRunner();
+      \Cider\Spec\Runner::runAll();
 
-      $specRunner->runAll();
-
-      $specReport = (object) $specRunner->report();
+      $specReport = (object) \Cider\Spec\Runner::report();
 
       foreach($specReport->specs as $specDescription => $specTestReport) {
 
@@ -201,7 +156,7 @@ try {
 
         }
 
-        $specDescriptionTitle .= sprintf(" (\033[\033[1;33m%s\033[0m ms)", round($specTestReport->timeElapsed * 1000, 6));
+        $specDescriptionTitle .= sprintf(" (\033[\033[1;33m%s\033[0m seconds)", round($specTestReport->timeElapsed, 6));
 
         send($specDescriptionTitle, "\n", "\n");
 
@@ -235,10 +190,18 @@ try {
 
       }
 
+      $numPassed = sprintf("\033[\033[1;32m%d\033[0m %s", $specReport->numPassed, 'passed');
+      $numFailed = sprintf("\033[\033[1;31m%d\033[0m %s", $specReport->numFailed, 'failed');
+      $numSkipped = sprintf("\033[\033[1;34m%d\033[0m %s", $specReport->numSkipped, 'skipped');
+
+      tell(sprintf("Ran a total of %d specs, ", $numTests) . implode(', ', [$numPassed, $numFailed, $numSkipped]));
+
+      tell(sprintf("Runner finished in \033[\033[1;33m%s\033[0m seconds.", round($specReport->timeElapsed, 6)));
+
     break;
 
   }
-
+/*
 } catch (\Exception $e) {
 
   send($e->getMessage());
@@ -257,3 +220,4 @@ try {
   }
 
 }
+*/

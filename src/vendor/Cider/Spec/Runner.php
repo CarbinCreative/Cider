@@ -20,7 +20,7 @@ use \Cider\Exceptions\BadMethodCallException;
 /**
  *  Runner
  *
- *  Spec runner, runs a test group, or single test.
+ *  Static spec runner.
  *
  *  @vendor Cider
  *  @package Spec
@@ -39,57 +39,57 @@ class Runner {
   /**
    *  @var callable $before
    */
-  protected $before;
+  protected static $before;
 
   /**
    *  @var callable $after
    */
-  protected $after;
+  protected static $after;
 
   /**
    *  @var callable $beforeEach
    */
-  protected $beforeEach;
+  protected static $beforeEach;
 
   /**
    *  @var callable $afterEach
    */
-  protected $afterEach;
+  protected static $afterEach;
 
   /**
    *  @var array $specs
    */
-  protected $specs = [];
+  protected static $specs = [];
 
   /**
    *  @var int $numSpecs
    */
-  protected $numSpecs = 0;
+  protected static $numSpecs = 0;
 
   /**
    *  @var string $currentSpec
    */
-  protected $currentSpec;
+  protected static $currentSpec;
 
   /**
    *  @var int $numSkipped
    */
-  protected $numSkipped = 0;
+  protected static $numSkipped = 0;
 
   /**
    *  @var int $numPassed
    */
-  protected $numPassed = 0;
+  protected static $numPassed = 0;
 
   /**
    *  @var int $numFailed
    */
-  protected $numFailed = 0;
+  protected static $numFailed = 0;
 
   /**
    *  @var array $report
    */
-  protected $report = [];
+  protected static $report = [];
 
   /**
    *  before
@@ -100,9 +100,9 @@ class Runner {
    *
    *  @return void
    */
-  public function before(Callable $beforeCallback) {
+  public static function before(Callable $beforeCallback) {
 
-    $this->before = $beforeCallback;
+    self::$before = $beforeCallback;
 
   }
 
@@ -115,9 +115,9 @@ class Runner {
    *
    *  @return void
    */
-  public function after(Callable $afterCallback) {
+  public static function after(Callable $afterCallback) {
 
-    $this->after = $afterCallback;
+    self::$after = $afterCallback;
 
   }
 
@@ -130,9 +130,9 @@ class Runner {
    *
    *  @return void
    */
-  public function beforeEach(Callable $beforeEachCallback) {
+  public static function beforeEach(Callable $beforeEachCallback) {
 
-    $this->beforeEach = $beforeEachCallback;
+    self::$beforeEach = $beforeEachCallback;
 
   }
 
@@ -145,9 +145,9 @@ class Runner {
    *
    *  @return void
    */
-  public function afterEach(Callable $afterEachCallback) {
+  public static function afterEach(Callable $afterEachCallback) {
 
-    $this->afterEach = $afterEachCallback;
+    self::$afterEach = $afterEachCallback;
 
   }
 
@@ -158,9 +158,9 @@ class Runner {
    *
    *  @return int
    */
-  public function numSkipped():Int {
+  public static function numSkipped():Int {
 
-    return $this->numSkipped;
+    return self::$numSkipped;
 
   }
 
@@ -171,9 +171,9 @@ class Runner {
    *
    *  @return int
    */
-  public function numPassed():Int {
+  public static function numPassed():Int {
 
-    return $this->numPassed;
+    return self::$numPassed;
 
   }
 
@@ -184,9 +184,9 @@ class Runner {
    *
    *  @return int
    */
-  public function numFailed():Int {
+  public static function numFailed():Int {
 
-    return $this->numFailed;
+    return self::$numFailed;
 
   }
 
@@ -199,13 +199,13 @@ class Runner {
    *
    *  @return void
    */
-  public function register(Spec $spec) {
+  public static function register(Spec $spec) {
 
-    $this->specs[$spec->description()] = $spec;
+    self::$specs[$spec->description()] = $spec;
 
-    $this->numSpecs = count($this->specs);
+    self::$numSpecs = count(self::$specs);
 
-    $this->currentSpec = $spec->description();
+    self::$currentSpec = $spec->description();
 
   }
 
@@ -216,9 +216,9 @@ class Runner {
    *
    *  @return void
    */
-  public function describe(String $specDescription, Callable $specContainer) {
+  public static function describe(String $specDescription, Callable $specContainer) {
 
-    return call_user_func($specContainer, $this);
+    return call_user_func($specContainer);
 
   }
 
@@ -232,45 +232,52 @@ class Runner {
    *
    *  @return void
    */
-  public function it(String $testDescription, Callable $testContainer) {
+  public static function it(String $testDescription, Callable $testContainer) {
 
-    if($this->currentSpec && array_key_exists($this->currentSpec, $this->specs) === true) {
+    if(self::$currentSpec && array_key_exists(self::$currentSpec, self::$specs) === true) {
 
-      $currentSpec = $this->specs[$this->currentSpec];
+      $currentSpec = self::$specs[self::$currentSpec];
 
       $currentSpec->it($testDescription, $testContainer);
 
-      return call_user_func($testContainer, $this);
+      return call_user_func($testContainer);
 
     }
 
   }
 
-  public function runAll() {
+  /**
+   *  runAll
+   *
+   *  Runs all spec tests.
+   *
+   *  @return void
+   */
+  public static function runAll() {
 
     $timeStart = microtime(true);
 
-    if(is_callable($this->before) === true) {
+    if(is_callable(self::$before) === true) {
 
-      call_user_func($this->before);
+      call_user_func(self::$before);
 
     }
 
     $specReports = [];
 
-    if($this->numSpecs > 0) {
+    if(self::$numSpecs > 0) {
 
-      foreach($this->specs as $specDescription => $spec) {
+      foreach(self::$specs as $specDescription => $spec) {
 
-        if(is_callable($this->beforeEach) === true) {
+        if(is_callable(self::$beforeEach) === true) {
 
-          $spec->before($this->beforeEach);
+          $spec->beforeEach(self::$beforeEach);
 
         }
 
-        if(is_callable($this->afterEach) === true) {
+        if(is_callable(self::$afterEach) === true) {
 
-          $spec->after($this->afterEach);
+          $spec->afterEach(self::$afterEach);
 
         }
 
@@ -278,19 +285,19 @@ class Runner {
 
         if($spec->skipped() === true) {
 
-          $this->numSkipped += 1;
+          self::$numSkipped += 1;
 
         }
 
         if($spec->passed() === true) {
 
-          $this->numPassed += 1;
+          self::$numPassed += 1;
 
         }
 
         if($spec->failed() === true) {
 
-          $this->numFailed += 1;
+          self::$numFailed += 1;
 
         }
 
@@ -308,21 +315,21 @@ class Runner {
 
     $timeLabel = implode(' ', ['Specs finished in', $timeElapsed, 'seconds.']);
 
-    $this->report = [
+    self::$report = [
       'timeStart' => $timeStart,
       'timeEnd' => $timeEnd,
       'timeElapsed' => $timeElapsed,
       'timeLabel' => $timeLabel,
-      'numSpecs' => $this->numSpecs,
-      'numSkipped' => $this->numSkipped,
-      'numPassed' => $this->numPassed,
-      'numFailed' => $this->numFailed,
+      'numSpecs' => self::$numSpecs,
+      'numSkipped' => self::$numSkipped,
+      'numPassed' => self::$numPassed,
+      'numFailed' => self::$numFailed,
       'specs' => $specReports
     ];
 
-    if(is_callable($this->after) === true) {
+    if(is_callable(self::$after) === true) {
 
-      call_user_func($this->after);
+      call_user_func(self::$after);
 
     }
 
@@ -335,9 +342,9 @@ class Runner {
    *
    *  @return array
    */
-  public function report():Array {
+  public static function report():Array {
 
-    return $this->report;
+    return self::$report;
 
   }
 

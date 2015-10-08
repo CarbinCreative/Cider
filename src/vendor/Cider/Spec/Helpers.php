@@ -14,24 +14,6 @@ namespace Cider\Spec;
 /* Deny direct file access */
 if(!defined('CIDER_ROOT_PATH')) exit;
 
-// Invoke spec runner
-$runner = new Runner;
-
-/**
- *  currentRunner
- *
- *  Returns current runner instance.
- *
- *  @return \Cider\Spec\Runner
- */
-function currentRunner():Runner {
-
-  global $runner;
-
-  return $runner;
-
-}
-
 /**
  *  describe
  *
@@ -44,14 +26,12 @@ function currentRunner():Runner {
  */
 function describe(String $specDescription, Callable $specContainer) {
 
-  global $runner;
-
   $spec = new Spec;
   $spec->describe($specDescription);
 
-  $runner->register($spec);
+  Runner::register($spec);
 
-  return $runner->describe($specDescription, $specContainer);
+  return Runner::describe($specDescription, $specContainer);
 
 }
 
@@ -67,9 +47,7 @@ function describe(String $specDescription, Callable $specContainer) {
  */
 function it(String $testDescription, Callable $testContainer) {
 
-  global $runner;
-
-  return $runner->it($testDescription, $testContainer);
+  return Runner::it($testDescription, $testContainer);
 
 }
 
@@ -84,9 +62,7 @@ function it(String $testDescription, Callable $testContainer) {
  */
 function before(Callable $beforeCallback) {
 
-  global $runner;
-
-  $runner->before($beforeCallback);
+  Runner::before($beforeCallback);
 
 }
 
@@ -101,9 +77,7 @@ function before(Callable $beforeCallback) {
  */
 function after(Callable $afterCallback) {
 
-  global $runner;
-
-  $runner->after($afterCallback);
+  Runner::after($afterCallback);
 
 }
 
@@ -118,9 +92,7 @@ function after(Callable $afterCallback) {
  */
 function beforeEach(Callable $beforeEachCallback) {
 
-  global $runner;
-
-  $runner->beforeEach($beforeEachCallback);
+  Runner::beforeEach($beforeEachCallback);
 
 }
 
@@ -135,9 +107,7 @@ function beforeEach(Callable $beforeEachCallback) {
  */
 function afterEach(Callable $afterEachCallback) {
 
-  global $runner;
-
-  $runner->afterEach($afterEachCallback);
+  Runner::afterEach($afterEachCallback);
 
 }
 

@@ -19,6 +19,10 @@ require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/FrameworkException.p
 require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/FileNotFoundException.php';
 
 /* @imports */
+use RegexIterator;
+use RecursiveRegexIterator;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use Cider\Exceptions\FileNotFoundException;
 
 /**
@@ -65,13 +69,17 @@ function path(String $unresolvedPath, Bool $appendDirectorySeparator = false, St
  */
 function relativeRequire(String $relativeRequirePath, Bool $throwException = false):Bool {
 
-  $resolvedRequirePath = path($relativeRequirePath) . '.php';
+  $resolvedRequirePath = path($relativeRequirePath);
+
+  if(substr($resolvedRequirePath, -4) !== '.php') {
+
+    $resolvedRequirePath .= '.php';
+
+  }
 
   if(file_exists($resolvedRequirePath) === true) {
 
     require_once $resolvedRequirePath;
-
-    return true;
 
   } else if($throwException === true) {
 
@@ -86,17 +94,43 @@ function relativeRequire(String $relativeRequirePath, Bool $throwException = fal
 /**
  *  import
  *
- *  Requires vendor package based on namespace path using {@see Cider\relativeRequire}.
+ *  Requires vendor package based on namespace path using {@see Cider\relativeRequire}, and returns number of files imported.
  *
- *  @param string $unresolvedNamespacePath
+ *  @param string $unresolvedNamespace
  *
- *  @return bool
+ *  @return int
  */
-function import(String $unresolvedNamespace):Bool {
+function import(String $unresolvedNamespace, String $includePathPrefix = null):Int {
 
+  $includePathPrefix = $includePathPrefix ?? 'src/vendor/';
   $namespaceDirectoryPath = str_replace(NAMESPACE_SEPARATOR, DIRECTORY_SEPARATOR, $unresolvedNamespace);
+  $resolvedNamespaceIncludePath = implode([$includePathPrefix, $namespaceDirectoryPath]);
 
-  return relativeRequire("src/vendor/{$namespaceDirectoryPath}", true);
+  if(substr($unresolvedNamespace, -1) === '*') {
+
+    $regexDirectoryIterator = new RegexIterator(
+      new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(substr($resolvedNamespaceIncludePath, 0, -1))
+      ),
+      '/^.+[A-Z][a-z]+\.php$/',
+      RecursiveRegexIterator::GET_MATCH
+    );
+
+    $includePaths = array_keys(iterator_to_array($regexDirectoryIterator));
+
+  } else {
+
+    $includePaths = [$resolvedNamespaceIncludePath];
+
+  }
+
+  foreach($includePaths as $includePath) {
+
+    relativeRequire($includePath, true);
+
+  }
+
+  return count($includePaths);
 
 }
 
