@@ -1,6 +1,8 @@
 <?php
 namespace Cider\Spec;
 
+/* @imports*/
+use function \Cider\expect;
 use stdClass as DummyClassObject;
 
 describe('Cider\Spec\Expectation', function() {

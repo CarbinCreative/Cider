@@ -15,10 +15,10 @@ namespace Cider;
 if(!defined('CIDER_ROOT_PATH')) exit;
 
 /* Import required files */
-require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions' 'FrameworkException.php']);
-require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions' 'FileNotFoundException.php']);
-require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions' 'BadMethodCallException.php']);
-require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Spec' 'Expectation.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions', 'FrameworkException.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions', 'FileNotFoundException.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions', 'BadMethodCallException.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Spec', 'Expectation.php']);
 
 /* @imports */
 use RegexIterator;
@@ -242,7 +242,6 @@ function slugify(String $unresolvedString, String $wordDelimiter = '-', Array $w
   return $resolvedString;
 
 }
-
 
 /**
  *  expect

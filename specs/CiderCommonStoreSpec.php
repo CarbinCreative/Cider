@@ -1,7 +1,11 @@
 <?php
 namespace Cider\Spec;
 
-\Cider\import('Cider\Common\Store');
+/* @imports*/
+use function \Cider\import;
+use function \Cider\expect;
+
+import('Cider\Common\Store');
 
 describe('Cider\Common\Store', function() {
 
