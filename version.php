@@ -11,4 +11,4 @@
 /**
  *  @const string CIDER_VERSION
  */
-define('CIDER_VERSION', '0.5.0');
+define('CIDER_VERSION', '0.5.1');

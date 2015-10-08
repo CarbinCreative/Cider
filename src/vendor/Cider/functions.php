@@ -15,15 +15,18 @@ namespace Cider;
 if(!defined('CIDER_ROOT_PATH')) exit;
 
 /* Import required files */
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/FrameworkException.php';
-require_once CIDER_ROOT_PATH . 'src/vendor/Cider/Exceptions/FileNotFoundException.php';
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions' 'FrameworkException.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions' 'FileNotFoundException.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions' 'BadMethodCallException.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Spec' 'Expectation.php']);
 
 /* @imports */
 use RegexIterator;
 use RecursiveRegexIterator;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-use Cider\Exceptions\FileNotFoundException;
+use \Cider\Spec\Expectation;
+use \Cider\Exceptions\FileNotFoundException;
 
 /**
  *  path
@@ -237,5 +240,21 @@ function slugify(String $unresolvedString, String $wordDelimiter = '-', Array $w
   $resolvedString = preg_replace("/[\/_|+ -]+/", $wordDelimiter, $resolvedString);
 
   return $resolvedString;
+
+}
+
+
+/**
+ *  expect
+ *
+ *  Creates a new expectation instance and returns it.
+ *
+ *  @param mixed $actual
+ *
+ *  @return \Cider\Spec\Expectation
+ */
+function expect($actual):Expectation {
+
+  return new Expectation($actual);
 
 }

@@ -110,18 +110,3 @@ function afterEach(Callable $afterEachCallback) {
   Runner::afterEach($afterEachCallback);
 
 }
-
-/**
- *  expect
- *
- *  Creates a new expectation instance and returns it.
- *
- *  @param mixed $actual
- *
- *  @return \Cider\Spec\Expectation
- */
-function expect($actual):Expectation {
-
-  return new Expectation($actual);
-
-}
