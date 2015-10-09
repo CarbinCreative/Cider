@@ -35,39 +35,98 @@ describe('Cider\Common\Store', function() {
 
   it('returns data store with Store::$data getter', function() use ($store, $helloWorldDict) {
 
-    return expect($helloWorldDict)->toEqual($store->data);
+    return expect($store->data)->toEqual($helloWorldDict);
 
   });
 
-  it('replaces data store with Storage::$data setter', function() use ($store, $gothamVillainsDict) {
+  it('replaces data store with Store::$data setter', function() use ($store, $gothamVillainsDict) {
 
     $store->data = $gothamVillainsDict;
 
-    return expect($helloWorldDict)->notToEqual($store->data);
+    return expect($store->data)->notToEqual($helloWorldDict);
 
   });
 
-  it('returns size of data store with Storage::$size', function() use ($store, $helloWorldDict) {
+  it('returns size of data store with Store::$size', function() use ($store, $helloWorldDict) {
 
     $helloWorldDictSize = count($helloWorldDict);
 
-    return expect($helloWorldDictSize)->toEqual($store->size);
+    return expect($store->size)->toEqual($helloWorldDictSize);
 
   });
 
-  it('returns only keys from data store with Storage::$keys', function() use ($store, $helloWorldDict) {
+  it('returns only keys from data store with Store::$keys', function() use ($store, $helloWorldDict) {
 
     $helloWorldDictKeys = array_keys($helloWorldDict);
 
-    return expect($helloWorldDictKeys)->toEqual($store->keys);
+    return expect($store->keys)->toEqual($helloWorldDictKeys);
 
   });
 
-  it('returns only values from data store with Storage::$values', function() use ($store, $helloWorldDict) {
+  it('returns only values from data store with Store::$values getter', function() use ($store, $helloWorldDict) {
 
     $helloWorldDictValues = array_values($helloWorldDict);
 
-    return expect($helloWorldDictValues)->toEqual($store->values);
+    return expect($store->values)->toEqual($helloWorldDictValues);
+
+  });
+
+  it('returns key from input value', function() use ($store) {
+
+    return expect($store->keyOf('Hello World'))->toEqual('en');
+
+  });
+
+  it('returns last key from data store with Store::$firstKey getter', function() use ($store, $helloWorldDict) {
+
+    $helloWorldDictKeys = array_keys($helloWorldDict);
+    $firstKeyInHelloWorldDict = $helloWorldDictKeys[0];
+
+    return expect($store->firstKey)->toEqual($firstKeyInHelloWorldDict);
+
+  });
+
+  it('returns last key from data store with Store::$lastKey getter', function() use ($store, $helloWorldDict) {
+
+    $helloWorldDictKeys = array_keys($helloWorldDict);
+    $helloWorldDictSize = count($helloWorldDict);
+    $lastKeyInHelloWorldDict = $helloWorldDictKeys[$helloWorldDictSize - 1];
+
+    return expect($store->lastKey)->toEqual($lastKeyInHelloWorldDict);
+
+  });
+
+  it('can check if a key exists', function() use ($store) {
+
+    return expect($store->has('en'))->toBeTrue();
+
+  });
+
+  it('can merge additional stores', function() use ($store, $helloWorldDict, $gothamVillainsDict) {
+
+    $mergedDicts = $helloWorldDict + $gothamVillainsDict;
+
+    $store->merge($gothamVillainsDict);
+
+    return expect($store->data)->toEqual($mergedDicts);
+
+  });
+
+  it('can serialize data store', function() use ($store, $gothamVillainsDict) {
+
+    $store->data = $gothamVillainsDict;
+    $jsonString = json_encode($gothamVillainsDict);
+
+    return expect($store->serialized)->toEqual($jsonString);
+
+  });
+
+  it('can parameterize data store', function() use ($store, $gothamVillainsDict) {
+
+    $store->data = $gothamVillainsDict;
+    $queryString = http_build_query($gothamVillainsDict);
+
+    return expect($store->parameterized)->toEqual($queryString);
 
   });
 

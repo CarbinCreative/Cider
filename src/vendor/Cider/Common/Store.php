@@ -83,6 +83,46 @@ class Store {
 
     });
 
+    $this->registerGetter('firstKey', function() {
+
+      $storeKeys = $this->keys;
+
+      return $storeKeys[0];
+
+    });
+
+    $this->registerGetter('lastKey', function() {
+
+      $storeKeys = $this->keys;
+
+      return $storeKeys[count($storeKeys) - 1];
+
+    });
+
+    $this->registerGetter('first', function() {
+
+      return $this->data[$this->firstKey];
+
+    });
+
+    $this->registerGetter('last', function() {
+
+      return $this->data[$this->lastKey];
+
+    });
+
+    $this->registerGetter('serialized', function() {
+
+      return $this->serialize();
+
+    });
+
+    $this->registerGetter('parameterized', function() {
+
+      return $this->parameterize();
+
+    });
+
   }
 
   /**
@@ -96,7 +136,7 @@ class Store {
    */
   public function has(String $storeKey):Bool {
 
-    return array_key_exists($storeKey);
+    return array_key_exists($storeKey, $this->data);
 
   }
 
@@ -175,6 +215,82 @@ class Store {
   public function remove(String $storeKey) {
 
     unset($this->__store[$storeKey]);
+
+  }
+
+  /**
+   *  replace
+   *
+   *  Replaces current store with new store.
+   *
+   *  @param array $newStore
+   *
+   *  @return void
+   */
+  public function replace(Array $newStore) {
+
+    $this->__store = $newStore;
+
+  }
+
+  /**
+   *  merge
+   *
+   *  Replaces current store with new store.
+   *
+   *  @param array|Store $stores, ...
+   *
+   *  @return void
+   */
+  public function merge(...$stores) {
+
+    $newStore = $this->data;
+
+    foreach($stores as $store) {
+
+      if(is_array($store) === true) {
+
+        $newStore = $newStore + $store;
+
+      } else if($store instanceof Store) {
+
+        $newStore = $newStore + $store->data;
+
+      }
+
+    }
+
+    $this->data = $newStore;
+
+  }
+
+  /**
+   *  serialize
+   *
+   *  Serializes store into a JSON string.
+   *
+   *  @param array $newStore
+   *
+   *  @return void
+   */
+  public function serialize():String {
+
+    return json_encode($this->data);
+
+  }
+
+  /**
+   *  parameterize
+   *
+   *  Parameterizes store into a query string.
+   *
+   *  @param array $newStore
+   *
+   *  @return void
+   */
+  public function parameterize():String {
+
+    return http_build_query($this->data);
 
   }
 

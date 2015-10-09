@@ -177,6 +177,19 @@ class Expectation {
   }
 
   /**
+   *  toBeTrue
+   *
+   *  Expect actual to be explicit true.
+   *
+   *  @return bool
+   */
+  public function toBeTrue():Bool {
+
+    return $this->actual === true;
+
+  }
+
+  /**
    *  toBeTruthy
    *
    *  Expect actual to be anything but falsy, {@see \Cider\Spec\Assertion::falsy}.
@@ -186,6 +199,19 @@ class Expectation {
   public function toBeTruthy():Bool {
 
     return $this->toBeFalsy() === false;
+
+  }
+
+  /**
+   *  toBeFalse
+   *
+   *  Expect actual to be explicit false.
+   *
+   *  @return bool
+   */
+  public function toBeFalse():Bool {
+
+    return $this->actual === false;
 
   }
 
