@@ -42,21 +42,33 @@ try {
 
   ob_start();
 
+  /* Resolve HTTP request */
+  app()->http->resolve();
+
   /* Load optional app bootstrap */
   relativeRequire('app/bootstrap');
 
-  /* Load optional route definitions */
+  /* Load routes */
   relativeRequire('app/routes');
+
+  /* @emits "rendering" */
+  app()->signal('rendering');
+
+  /* Dispatch current request URI */
+  echo dispatcher()->dispatch(uri());
 
   $outputBuffer = ob_get_clean();
 
-  echo 'Cider ' . CIDER_VERSION;
-
 } catch (FrameworkException $exception) {
+
+  app()->http->send(500);
 
   $outputBuffer = $exception;
 
 } finally {
+
+  /* Send HTTP headers */
+  app()->http->sendHeaders();
 
   /* Send output */
   echo $outputBuffer;

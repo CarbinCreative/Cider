@@ -15,7 +15,8 @@ namespace Cider\Common;
 if(!defined('CIDER_ROOT_PATH')) exit;
 
 /* @imports */
-use Cider\Exceptions\BadMethodCallException;
+use ReflectionClass;
+use \Cider\Exceptions\BadMethodCallException;
 
 /**
  *  Factory
@@ -47,21 +48,23 @@ trait Factory {
    */
   public function initialize(String $className, String $instanceName, String $classMethodName = null, ...$classMethodArguments) {
 
-    if(isset($this->$instanceName) === true) {
+    if($this->get($instanceName) !== null) {
 
       throw new BadMethodCallException('Instance already initialized.');
 
     }
 
-    $this->$instanceName = call_user_func_array(
+    $classInstance = call_user_func_array(
       [
-        new \ReflectionClass($className),
+        new ReflectionClass($className),
         $classMethodName ?? 'newInstance'
       ],
       $classMethodArguments
     );
 
-    return $this->$instanceName;
+    $this->set($instanceName, $classInstance);
+
+    return $classInstance;
 
   }
 

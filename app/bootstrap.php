@@ -8,7 +8,10 @@
  *  @license http://opensource.org/licenses/MIT MIT
  */
 
-/**
- *  @const string CIDER_VERSION
- */
-define('CIDER_VERSION', '0.5.5');
+/* @namespace Cider */
+namespace Cider;
+
+/* Deny direct file access */
+if(!defined('CIDER_ROOT_PATH')) exit;
+
+/* Application bootstraps */

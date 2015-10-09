@@ -259,7 +259,7 @@ class Spec {
    *
    *  @param string $testDescription
    *
-   *  @emits 'skip'
+   *  @emits "skip"
    *
    *  @return void
    */
@@ -278,7 +278,7 @@ class Spec {
    *
    *  @param string $testDescription
    *
-   *  @emits 'pass'
+   *  @emits "pass"
    *
    *  @return void
    */
@@ -297,7 +297,7 @@ class Spec {
    *
    *  @param string $testDescription
    *
-   *  @emits 'fail'
+   *  @emits "fail"
    *
    *  @return void
    */
@@ -353,7 +353,7 @@ class Spec {
    *
    *  Runs all tests in this spec.
    *
-   *  @emits 'tick'
+   *  @emits "tick"
    *
    *  @return void
    */

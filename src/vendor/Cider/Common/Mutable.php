@@ -97,54 +97,6 @@ trait Mutable {
   }
 
   /**
-   *  set
-   *
-   *  Sets store value using setter if present, otherwise sets value by mutating data store.
-   *
-   *  @param string $storeKey
-   *  @param mixed $mixedValue
-   *
-   *  @return void
-   */
-  public function set(String $storeKey, $mixedValue) {
-
-    if($storeKey === '__store') {
-
-      $this->__store = $mixedValue;
-
-    } else if($this->hasSetter($storeKey) === true) {
-
-      $setterCallback = $this->setterCallbacks[$storeKey];
-
-      $boundSetterCallback = Closure::bind($setterCallback, $this);
-
-      $boundSetterCallback($mixedValue);
-
-    } else {
-
-      $this->__store[$storeKey] = $mixedValue;
-
-    }
-
-  }
-
-  /**
-   *  __set
-   *
-   *  Invokes {@see \Cider\Common\Mutable::set}.
-   *
-   *  @param string $storeKey
-   *  @param mixed $mixedValue
-   *
-   *  @return void
-   */
-  public function __set(String $storeKey, $mixedValue) {
-
-    $this->set($storeKey, $mixedValue);
-
-  }
-
-  /**
    *  hasGetter
    *
    *  Validates whether or not a property has a getter callback.
@@ -197,6 +149,54 @@ trait Mutable {
   /**
    *  set
    *
+   *  Sets store value using setter if present, otherwise sets value by mutating data store.
+   *
+   *  @param string $storeKey
+   *  @param mixed $mixedValue
+   *
+   *  @return void
+   */
+  public function set(String $storeKey, $mixedValue) {
+
+    if($storeKey === '__store') {
+
+      $this->__store = $mixedValue;
+
+    } else if($this->hasSetter($storeKey) === true) {
+
+      $setterCallback = $this->setterCallbacks[$storeKey];
+
+      $boundSetterCallback = Closure::bind($setterCallback, $this);
+
+      $boundSetterCallback($mixedValue);
+
+    } else {
+
+      $this->__store[$storeKey] = $mixedValue;
+
+    }
+
+  }
+
+  /**
+   *  __set
+   *
+   *  Invokes {@see \Cider\Common\Mutable::set}.
+   *
+   *  @param string $storeKey
+   *  @param mixed $mixedValue
+   *
+   *  @return void
+   */
+  public function __set(String $storeKey, $mixedValue) {
+
+    $this->set($storeKey, $mixedValue);
+
+  }
+
+  /**
+   *  set
+   *
    *  Gets store value using getter if present, otherwise returns value from data store.
    *
    *  @param string $storeKey
@@ -217,9 +217,11 @@ trait Mutable {
 
       return $boundGetterCallback($storeKey);
 
-    }
+    } else {
 
-    return $this->__store[$storeKey] ?? null;
+      return $this->__store[$storeKey] ?? null;
+
+    }
 
   }
 

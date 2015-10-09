@@ -166,7 +166,7 @@ class Store {
    */
   public function keyOf($mixedValue):String {
 
-    return array_search($mixedValue, $this->__store);
+    return array_search($mixedValue, $this->data);
 
   }
 

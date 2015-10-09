@@ -26,3 +26,6 @@ spl_autoload_register(function($className) {
 });
 
 /* Initialize default libraries */
+$httpClient = app()->initialize('Cider\Http\Client', 'http');
+$routeMap = app()->initialize('Cider\Delegation\RouteMap', 'routeMap');
+app()->initialize('Cider\Delegation\Dispatcher', 'dispatcher', null, $httpClient, $routeMap);

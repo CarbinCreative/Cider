@@ -29,44 +29,37 @@ if(!defined('CIDER_ROOT_PATH')) exit;
 trait Singleton {
 
   /**
-   *  @staticvar self $instance
+   *  @staticvar self $__instance
    */
-  protected static $instance;
+  protected static $__instance;
 
   /**
    *  getInstance
    *
-   *  Returns singleton instance.
+   *  Returns self initialized instance.
    *
    *  @return self
    */
-  final public static function getInstance():self {
+  public static function getInstance():self {
 
-    return static::$instance ?: new static;
+    if(is_object(self::$__instance) === false) {
+
+      self::$__instance = new self;
+
+    }
+
+    return self::$__instance;
 
   }
 
   /**
    *  Constructor
    *
-   *  Calls {@see \Cider\Common\Singleton::init}. Initialization disabled via 'final' and 'private' keywords.
+   *  Initialization disabled via 'final' and 'private' keywords.
    *
    *  @return void
    */
-  final private function __construct() {
-
-    $this->init();
-
-  }
-
-  /**
-   *  init
-   *
-   *  Overridable noop method, called in {@see \Cider\Common\Singleton::__construct}.
-   *
-   *  @return void
-   */
-  protected function init() {}
+  final private function __construct() {}
 
   /**
    *  __wakeup
