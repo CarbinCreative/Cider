@@ -37,26 +37,6 @@ class Runner {
   const SPEC_SLEEP_DELAY = 1000;
 
   /**
-   *  @var callable $before
-   */
-  protected static $before;
-
-  /**
-   *  @var callable $after
-   */
-  protected static $after;
-
-  /**
-   *  @var callable $beforeEach
-   */
-  protected static $beforeEach;
-
-  /**
-   *  @var callable $afterEach
-   */
-  protected static $afterEach;
-
-  /**
    *  @var array $specs
    */
   protected static $specs = [];
@@ -70,6 +50,11 @@ class Runner {
    *  @var string $currentSpec
    */
   protected static $currentSpec;
+
+  /**
+   *  @var \Cider\Spec\Spec $currentSpecInstance
+   */
+  protected static $currentSpecInstance;
 
   /**
    *  @var int $numSkipped
@@ -94,7 +79,7 @@ class Runner {
   /**
    *  before
    *
-   *  Adds a callback that is called before a spec is run.
+   *  Adds a callback to current spec, that is called before a spec is run.
    *
    *  @param callable $beforeCallback
    *
@@ -102,14 +87,18 @@ class Runner {
    */
   public static function before(Callable $beforeCallback) {
 
-    self::$before = $beforeCallback;
+    if(self::$currentSpecInstance instanceof Spec) {
+
+      self::$currentSpecInstance->before($beforeCallback);
+
+    }
 
   }
 
   /**
    *  after
    *
-   *  Adds a callback that is called after a spec is run.
+   *  Adds a callback to current spec, that is called after a spec is run.
    *
    *  @param callable $afterCallback
    *
@@ -117,14 +106,18 @@ class Runner {
    */
   public static function after(Callable $afterCallback) {
 
-    self::$after = $afterCallback;
+    if(self::$currentSpecInstance instanceof Spec) {
+
+      self::$currentSpecInstance->after($afterCallback);
+
+    }
 
   }
 
   /**
    *  beforeEach
    *
-   *  Adds a callback that is called before each spec test is run.
+   *  Adds a callback to current spec, that is called before each spec test is run.
    *
    *  @param callable $beforeEachCallback
    *
@@ -132,14 +125,18 @@ class Runner {
    */
   public static function beforeEach(Callable $beforeEachCallback) {
 
-    self::$beforeEach = $beforeEachCallback;
+    if(self::$currentSpecInstance instanceof Spec) {
+
+      self::$currentSpecInstance->beforeEach($beforeEachCallback);
+
+    }
 
   }
 
   /**
    *  afterEach
    *
-   *  Adds a callback that is called after each spec test is run.
+   *  Adds a callback to current spec, that is called after each spec test is run.
    *
    *  @param callable $afterEachCallback
    *
@@ -147,7 +144,11 @@ class Runner {
    */
   public static function afterEach(Callable $afterEachCallback) {
 
-    self::$afterEach = $afterEachCallback;
+    if(self::$currentSpecInstance instanceof Spec) {
+
+      self::$currentSpecInstance->afterEach($afterEachCallback);
+
+    }
 
   }
 
@@ -207,6 +208,8 @@ class Runner {
 
     self::$currentSpec = $spec->description();
 
+    self::$currentSpecInstance = $spec;
+
   }
 
   /**
@@ -236,9 +239,7 @@ class Runner {
 
     if(self::$currentSpec && array_key_exists(self::$currentSpec, self::$specs) === true) {
 
-      $currentSpec = self::$specs[self::$currentSpec];
-
-      $currentSpec->it($testDescription, $testContainer);
+      self::$currentSpecInstance->it($testDescription, $testContainer);
 
       return call_user_func($testContainer);
 
@@ -257,29 +258,11 @@ class Runner {
 
     $timeStart = microtime(true);
 
-    if(is_callable(self::$before) === true) {
-
-      call_user_func(self::$before);
-
-    }
-
     $specReports = [];
 
     if(self::$numSpecs > 0) {
 
       foreach(self::$specs as $specDescription => $spec) {
-
-        if(is_callable(self::$beforeEach) === true) {
-
-          $spec->beforeEach(self::$beforeEach);
-
-        }
-
-        if(is_callable(self::$afterEach) === true) {
-
-          $spec->afterEach(self::$afterEach);
-
-        }
 
         $spec->run();
 
@@ -326,12 +309,6 @@ class Runner {
       'numFailed' => self::$numFailed,
       'specs' => $specReports
     ];
-
-    if(is_callable(self::$after) === true) {
-
-      call_user_func(self::$after);
-
-    }
 
   }
 
