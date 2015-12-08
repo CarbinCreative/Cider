@@ -116,7 +116,7 @@ require_once CIDER_ROOT_PATH . 'src/vendor/Cider/functions.php';
 
 $allTestsPassed = true;
 
-//try {
+try {
 
   $command = argv();
 
@@ -201,7 +201,7 @@ $allTestsPassed = true;
     break;
 
   }
-/*
+
 } catch (\Exception $e) {
 
   send($e->getMessage());
@@ -220,4 +220,3 @@ $allTestsPassed = true;
   }
 
 }
-*/
