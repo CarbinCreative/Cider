@@ -11,6 +11,9 @@
 /* @namespace Cider */
 namespace Cider;
 
+/* @imports */
+use Cider\Exceptions\FrameworkException;
+
 /**
  *  @const string NAMESPACE_SEPARATOR
  */
@@ -57,13 +60,13 @@ try {
   /* Dispatch current request URI */
   echo dispatcher()->dispatch(uri());
 
+  /* Capture buffer */
   $outputBuffer = ob_get_clean();
 
 } catch (FrameworkException $exception) {
 
-  app()->http->send(500);
-
-  $outputBuffer = $exception;
+  /* Dispatch generic exceptions */
+  $outputBuffer = dispatcher()->dispatchError($exception);
 
 } finally {
 

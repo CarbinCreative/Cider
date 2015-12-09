@@ -90,6 +90,11 @@ class RouteMap {
   protected $missingRouteCallback;
 
   /**
+   *  @var callable $errorRouteCallback
+   */
+  protected $errorRouteCallback;
+
+  /**
    *  allowCustomRequestMethods
    *
    *  Allows custom HTTP request methods.
@@ -509,11 +514,13 @@ class RouteMap {
    *
    *  @param callable $missingRouteCallback
    *
-   *  @return void
+   *  @return self
    */
-  public function missingRoute(Callable $missingRouteCallback) {
+  public function missingRoute(Callable $missingRouteCallback):self {
 
     $this->missingRouteCallback = $missingRouteCallback;
+
+    return $this;
 
   }
 
@@ -533,6 +540,42 @@ class RouteMap {
     }
 
     return '404 Not Found';
+
+  }
+
+  /**
+   *  errorRoute
+   *
+   *  Registeres a exception route callback handler.
+   *
+   *  @param callable $errorRouteCallback
+   *
+   *  @return self
+   */
+  public function errorRoute(Callable $errorRouteCallback):self {
+
+    $this->errorRouteCallback = $errorRouteCallback;
+
+    return $this;
+
+  }
+
+  /**
+   *  handleErrorRoute
+   *
+   *  Invokes missing route callback handler.
+   *
+   *  @return string
+   */
+  public function handleErrorRoute():String {
+
+    if(is_callable($this->errorRouteCallback) === true) {
+
+      return call_user_func_array($this->errorRouteCallback, []);
+
+    }
+
+    return '500 Internal Server Error';
 
   }
 

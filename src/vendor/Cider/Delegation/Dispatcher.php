@@ -15,7 +15,8 @@ namespace Cider\Delegation;
 if(!defined('CIDER_ROOT_PATH')) exit;
 
 /* @imports */
-use \Cider\Http\Client as HttpClient;
+use Cider\Http\Client as HttpClient;
+use Cider\Exceptions\FrameworkException;
 
 /**
  *  Map
@@ -135,7 +136,7 @@ class Dispatcher {
 
       $this->emit('missingRoute');
 
-      $this->httpClient->setStatusCode(404);
+      $this->httpClient->send(404);
 
       return $this->routeMap->handleMissingRoute();
 
@@ -144,6 +145,26 @@ class Dispatcher {
     $this->emit('dispatched');
 
     return $response ?? '';
+
+  }
+
+  /**
+   *  dispatchError
+   *
+   *  Dispatches error route.
+   *
+   *  @param Cider\Exceptions\FrameworkException $exception
+   *  @param int $errorStatusCode
+   *
+   *  @return string
+   */
+  public function dispatchError(FrameworkException $exception, Int $errorStatusCode = 500):String {
+
+    $this->emit('errorRoute');
+
+    $this->httpClient->send($errorStatusCode);
+
+    return $this->routeMap->handleErrorRoute();
 
   }
 
