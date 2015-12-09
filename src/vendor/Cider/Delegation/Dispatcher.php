@@ -119,7 +119,7 @@ class Dispatcher {
 
         if($routePath->matches($requestUri) === true) {
 
-          $output = $routePath->invoke();
+          $response = $routePath->invoke();
 
           $foundMatch = true;
 
@@ -135,11 +135,15 @@ class Dispatcher {
 
       $this->emit('missingRoute');
 
+      $this->httpClient->setStatusCode(404);
+
+      return $this->routeMap->handleMissingRoute();
+
     }
 
     $this->emit('dispatched');
 
-    return $output ?? '';
+    return $response ?? '';
 
   }
 

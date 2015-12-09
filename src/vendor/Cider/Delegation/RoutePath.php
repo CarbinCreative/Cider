@@ -282,6 +282,74 @@ class RoutePath {
   }
 
   /**
+   *  parameterExists
+   *
+   *  Validates if a parameter exists.
+   *
+   *  @param string $parameterName
+   *
+   *  @return bool
+   */
+  public function parameterExists(String $parameterName):Bool {
+
+    return array_key_exists($parameterName, $this->parameters);
+
+  }
+
+  /**
+   *  parameterMatches
+   *
+   *  Validates if a parameter matches expected data.
+   *
+   *  @param string $parameterName
+   *  @param mixed $expectedParameterData
+   *
+   *  @return bool
+   */
+  public function parameterMatches(String $parameterName, $expectedParameterData):Bool {
+
+    if($this->parameterExists($parameterName) === true) {
+
+      return $this->getParamerer($parameterName) === $expectedParameterData;
+
+    }
+
+    return false;
+
+  }
+
+  /**
+   *  setParamerer
+   *
+   *  Sets a condition to current route path object.
+   *
+   *  @param string $parameterName
+   *  @param mixed $parameterData
+   *
+   *  @return void
+   */
+  public function setParamerer(String $parameterName, $parameterData) {
+
+    $this->parameters[$parameterName] = $parameterData;
+
+  }
+
+  /**
+   *  getParamerer
+   *
+   *  Returns condition if it exists.
+   *
+   *  @param string $parameterName
+   *
+   *  @return string
+   */
+  public function getParamerer(String $parameterName):String {
+
+    return $this->parameters[$parameterName] ?? '';
+
+  }
+
+  /**
    *  patternToRegex
    *
    *  Creates a regex from route pattern.
@@ -425,11 +493,12 @@ class RoutePath {
    *
    *  Invokes and collects return values from route path middlewares.
    *
-   *  @return array
+   *  @param \Cider\Http\Client $httpClient
+   *  @param string $callbackOutput
+   *
+   *  @return string
    */
-  protected function invokeMiddlewares():Array {
-
-    $outputFromMiddlewares = [];
+  protected function invokeMiddlewares(String $callbackOutput):String {
 
     foreach($this->middlewares as $index => $middleware) {
 
@@ -437,13 +506,13 @@ class RoutePath {
 
         $nextMiddleware = $this->middlewares[$index + 1];
 
-        $outputFromMiddlewares[] = call_user_func_array($middleware, [$nextMiddleware]);
-
       }
+
+      $callbackOutput = call_user_func_array($middleware, [$this, $callbackOutput ?? '', $nextMiddleware ?? null]);
 
     }
 
-    return $outputFromMiddlewares;
+    return $callbackOutput;
 
   }
 
@@ -458,13 +527,13 @@ class RoutePath {
 
     $parameters = $this->invokeBeforeCallback($this->parameters);
 
-    $parameters = array_merge($parameters, $this->invokeMiddlewares());
+    $callbackOutput = call_user_func_array($this->callback, $parameters);
 
-    $output = call_user_func_array($this->callback, $parameters);
+    $callbackOutput = $this->invokeMiddlewares($callbackOutput);
 
-    $output = $this->invokeAfterCallback($output);
+    $callbackOutput = $this->invokeAfterCallback($callbackOutput);
 
-    return $output;
+    return $callbackOutput;
 
   }
 

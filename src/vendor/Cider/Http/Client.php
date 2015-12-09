@@ -982,4 +982,25 @@ class Client {
 
   }
 
+  /**
+   *  redirect
+   *
+   *  Sends a redirect status.
+   *
+   *  @param string $redirectUrl
+   *  @param int $redirectStatusCode
+   *
+   *  @return void
+   */
+  public function redirect(String $redirectUrl, Int $redirectStatusCode = 302) {
+
+    if(strlen($redirectUrl) > 0) {
+
+      header("Location: {$redirectUrl}", true, $redirectStatusCode);
+      exit;
+
+    }
+
+  }
+
 }

@@ -85,6 +85,11 @@ class RouteMap {
   protected $cachedRouteRequestMethods = [];
 
   /**
+   *  @var callable $missingRouteCallback
+   */
+  protected $missingRouteCallback;
+
+  /**
    *  allowCustomRequestMethods
    *
    *  Allows custom HTTP request methods.
@@ -494,6 +499,40 @@ class RouteMap {
   public function delete(String $routeRequestPathPattern, Callable $routeRequestCallback):RoutePath {
 
     return $this->add('delete', $routeRequestPathPattern, $routeRequestCallback);
+
+  }
+
+  /**
+   *  missingRoute
+   *
+   *  Registeres a missing route callback handler.
+   *
+   *  @param callable $missingRouteCallback
+   *
+   *  @return void
+   */
+  public function missingRoute(Callable $missingRouteCallback) {
+
+    $this->missingRouteCallback = $missingRouteCallback;
+
+  }
+
+  /**
+   *  handleMissingRoute
+   *
+   *  Invokes missing route callback handler.
+   *
+   *  @return string
+   */
+  public function handleMissingRoute():String {
+
+    if(is_callable($this->missingRouteCallback) === true) {
+
+      return call_user_func_array($this->missingRouteCallback, []);
+
+    }
+
+    return '404 Not Found';
 
   }
 
