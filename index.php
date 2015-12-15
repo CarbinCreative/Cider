@@ -63,7 +63,7 @@ try {
   /* Capture buffer */
   $outputBuffer = ob_get_clean();
 
-} catch (FrameworkException $exception) {
+} catch (\Exception $exception) {
 
   /* Dispatch generic exceptions */
   $outputBuffer = dispatcher()->dispatchError($exception);

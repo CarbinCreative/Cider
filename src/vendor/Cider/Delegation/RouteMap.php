@@ -353,7 +353,7 @@ class RouteMap {
    *
    *  @return \Cider\Route\RoutePath
    */
-  public function add(String $routeRequestMethod, String $routeRequestPathPattern, Callable $routeRequestCallback):RoutePath {
+  public function add(String $routeRequestMethod, String $routeRequestPathPattern, Callable $routeRequestCallback = null):RoutePath {
 
     $routeRequestMethods = explode(self::REQUEST_METHOD_DELIMITER, $routeRequestMethod);
 
@@ -386,7 +386,7 @@ class RouteMap {
 
       }
 
-      $routeRequestObject = new RoutePath($routeRequestPath, $routeRequestCallback);
+      $routeRequestObject = new RoutePath($routeRequestPath, $routeRequestCallback ?? $noopRouteCallback);
       $this->routePaths[$routeRequestPath][$routeRequestMethod] = $routeRequestObject;
 
     }
@@ -405,9 +405,11 @@ class RouteMap {
    *
    *  @return \Cider\Route\RoutePath
    */
-  public function any(String $routeRequestPathPattern, Callable $routeRequestCallback):RoutePath {
+  public function any(String $routeRequestPathPattern, Callable $routeRequestCallback = null):RoutePath {
 
-    return $this->add('any', $routeRequestPathPattern, $routeRequestCallback);
+    $noopRouteCallback = [$this, 'noopRouteCallback'];
+
+    return $this->add('any', $routeRequestPathPattern, $routeRequestCallback ?? $noopRouteCallback);
 
   }
 

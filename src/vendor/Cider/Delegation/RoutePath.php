@@ -39,7 +39,7 @@ class RoutePath {
   /**
    *  @const string ROUTE_PATTERN_PARAMETER_REGEX
    */
-  const ROUTE_PATTERN_PARAMETER_REGEX = '~:([\w]+)\+?~';
+  const ROUTE_PATTERN_PARAMETER_REGEX = '~:([\w]+)[\+|\?]?~';
 
   /**
    *  @var int $maxMiddlewares
@@ -103,6 +103,32 @@ class RoutePath {
     $this->patternRegex = $this->patternToRegex($this->patternPath);
 
     $this->callback = $routeCallback;
+
+  }
+
+  /**
+   *  route
+   *
+   *  Returns pattern path string.
+   *
+   *  @return string
+   */
+  public function route():String {
+
+    return $this->patternPath;
+
+  }
+
+  /**
+   *  pattern
+   *
+   *  Returns pattern regex string.
+   *
+   *  @return string
+   */
+  public function pattern():String {
+
+    return $this->patternRegex;
 
   }
 
@@ -175,6 +201,23 @@ class RoutePath {
   }
 
   /**
+   *  with
+   *
+   *  Callback invoked when a route is matched.
+   *
+   *  @param callable $routeCallback
+   *
+   *  @return self
+   */
+  public function with(Callable $routeCallback):self {
+
+    $this->callback = $routeCallback;
+
+    return $this;
+
+  }
+
+  /**
    *  before
    *
    *  Callback invoked before a route is matched.
@@ -235,6 +278,7 @@ class RoutePath {
    */
   public function setCondition(String $parameterName, String $conditionRegex) {
 
+    $parameterName = str_replace(':', '', $parameterName);
     $this->conditions[$parameterName] = $conditionRegex;
 
     // Update pattern regex
@@ -282,6 +326,27 @@ class RoutePath {
   }
 
   /**
+   *  conditions
+   *
+   *  Sets several route conditions using {@see \Cider\Delegation\RoutePath::setCondition}.
+   *
+   *  @param array $conditions
+   *
+   *  @return self
+   */
+  public function conditions(Array $conditions):self {
+
+    foreach($conditions as $parameterName => $conditionRegex) {
+
+      $this->setCondition($parameterName, $conditionRegex);
+
+    }
+
+    return $this;
+
+  }
+
+  /**
    *  parameterExists
    *
    *  Validates if a parameter exists.
@@ -319,7 +384,7 @@ class RoutePath {
   }
 
   /**
-   *  setParamerer
+   *  setParameter
    *
    *  Sets a condition to current route path object.
    *
@@ -328,14 +393,14 @@ class RoutePath {
    *
    *  @return void
    */
-  public function setParamerer(String $parameterName, $parameterData) {
+  public function setParameter(String $parameterName, $parameterData) {
 
     $this->parameters[$parameterName] = $parameterData;
 
   }
 
   /**
-   *  getParamerer
+   *  getParameter
    *
    *  Returns condition if it exists.
    *
@@ -343,7 +408,7 @@ class RoutePath {
    *
    *  @return string
    */
-  public function getParamerer(String $parameterName):String {
+  public function getParameter(String $parameterName):String {
 
     return $this->parameters[$parameterName] ?? '';
 
@@ -449,42 +514,44 @@ class RoutePath {
   /**
    *  invokeBeforeCallback
    *
-   *  Invokes a "before" callback, passes through request parameters, callback must return array.
+   *  Invokes a "before" callback, which may manipulate request object, and response string.
    *
-   *  @param array $requestParameters
+   *  @param mixed $request
+   *  @param string $response
    *
    *  @return array
    */
-  protected function invokeBeforeCallback(Array $requestParameters):Array {
+  protected function invokeBeforeCallback($request, String $response):Array {
 
     if(is_callable($this->beforeCallback) === true) {
 
-      $requestParameters = call_user_func_array($this->beforeCallback, [$requestParameters]);
+      list($request, $response) = call_user_func_array($this->beforeCallback, [$request, $response]);
 
     }
 
-    return $requestParameters;
+    return [$request, $response];
 
   }
 
   /**
    *  invokeBeforeCallback
    *
-   *  Invokes a "before" callback, passes through request parameters, callback must return array.
+   *  Invokes a "after" callback, which may manipulate request object, and response string.
    *
-   *  @param array $requestParameters
+   *  @param mixed $request
+   *  @param string $response
    *
-   *  @return string
+   *  @return array
    */
-  protected function invokeAfterCallback(String $callbackOutput):String {
+  protected function invokeAfterCallback($request, String $response):Array {
 
     if(is_callable($this->afterCallback) === true) {
 
-      $callbackOutput = call_user_func_array($this->afterCallback, [$callbackOutput]);
+      list($request, $response) = call_user_func_array($this->afterCallback, [$request, $response]);
 
     }
 
-    return $callbackOutput;
+    return [$request, $response];
 
   }
 
@@ -493,12 +560,12 @@ class RoutePath {
    *
    *  Invokes and collects return values from route path middlewares.
    *
-   *  @param \Cider\Http\Client $httpClient
-   *  @param string $callbackOutput
+   *  @param mixed $request
+   *  @param string $response
    *
-   *  @return string
+   *  @return array
    */
-  protected function invokeMiddlewares(String $callbackOutput):String {
+  protected function invokeMiddlewares($request, String $response):Array {
 
     foreach($this->middlewares as $index => $middleware) {
 
@@ -508,11 +575,11 @@ class RoutePath {
 
       }
 
-      $callbackOutput = call_user_func_array($middleware, [$this, $callbackOutput ?? '', $nextMiddleware ?? null]);
+      list($request, $response) = call_user_func_array($middleware, [$request, $response, $nextMiddleware ?? null]);
 
     }
 
-    return $callbackOutput;
+    return [$request, $response];
 
   }
 
@@ -525,15 +592,15 @@ class RoutePath {
    */
   public function invoke():String {
 
-    $parameters = $this->invokeBeforeCallback($this->parameters);
+    list($request, $response) = $this->invokeBeforeCallback($this, '');
 
-    $callbackOutput = call_user_func_array($this->callback, $parameters);
+    $response = call_user_func_array($this->callback, array_merge([$request, $response], $this->parameters));
 
-    $callbackOutput = $this->invokeMiddlewares($callbackOutput);
+    list($request, $response) = $this->invokeMiddlewares($request, $response);
 
-    $callbackOutput = $this->invokeAfterCallback($callbackOutput);
+    list($request, $response) = $this->invokeAfterCallback($request, $response);
 
-    return $callbackOutput;
+    return $response;
 
   }
 

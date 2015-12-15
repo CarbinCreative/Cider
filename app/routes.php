@@ -14,6 +14,20 @@ namespace Cider;
 /* Deny direct file access */
 if(!defined('CIDER_ROOT_PATH')) exit;
 
+/* Add your own 404 and 5xx callbacks here */
+
+route()
+  ->missingRoute(function() {
+
+    return '<h1>Page Not Found</h1>';
+
+  })
+  ->errorRoute(function() {
+
+    return '<h1>Page Error</h1>';
+
+  });
+
 /* Set up routes and app specific event listeners */
 
 route()->get('/', function() {
