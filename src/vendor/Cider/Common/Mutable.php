@@ -236,7 +236,7 @@ trait Mutable {
    */
   public function __get(String $storeKey) {
 
-    return $this->get($storeKey, $mixedValue);
+    return $this->get($storeKey);
 
   }
 

@@ -13,6 +13,7 @@
 namespace Cider\Shell;
 
 /* @imports */
+use Closure;
 use RegexIterator;
 use RecursiveRegexIterator;
 use RecursiveIteratorIterator;
@@ -39,6 +40,18 @@ defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
  *  @const stream STDOUT
  */
 defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
+
+/**
+ *  Error handling
+ */
+error_reporting(E_ALL ^ E_NOTICE);
+ini_set('display_errors', false);
+
+set_error_handler(function($severity, $error, $file, $fileLine) {
+
+  throw new \ErrorException($error, $severity, 0, $file, $fileLine);
+
+});
 
 /**
  *  send
@@ -102,9 +115,10 @@ function tell(String $message, ...$replacements) {
 }
 
 /**
- *  Run!
+ *  Run tests
  */
-error_reporting(E_ALL ^ E_NOTICE);
+
+$allTestsPassed = false;
 
 require_once CIDER_ROOT_PATH . 'src/vendor/Cider/functions.php';
 
@@ -113,8 +127,6 @@ require_once CIDER_ROOT_PATH . 'src/vendor/Cider/functions.php';
 \Cider\import('Cider\Event\Emitter');
 \Cider\import('Cider\Spec\*');
 \Cider\import('Cider\Spec\helpers');
-
-$allTestsPassed = true;
 
 try {
 
@@ -125,8 +137,6 @@ try {
     case 'test' :
 
       $numTests = \Cider\import('*', 'specs');
-
-      $exitCode = 0;
 
       tell('Waiting for %d tests...', $numTests);
 
@@ -149,10 +159,6 @@ try {
         } if($specTestReport->failed === true) {
 
           $specDescriptionTitle = sprintf("  [\033[\033[1;31m%s\033[0m] Spec %s", 'FAIL', $specDescription);
-
-          $allTestsPassed = false;
-
-          $exitCode = 1;
 
         }
 
@@ -194,29 +200,33 @@ try {
       $numFailed = sprintf("\033[\033[1;31m%d\033[0m %s", $specReport->numFailed, 'failed');
       $numSkipped = sprintf("\033[\033[1;34m%d\033[0m %s", $specReport->numSkipped, 'skipped');
 
-      tell(sprintf("Ran a total of %d specs, ", $numTests) . implode(', ', [$numPassed, $numFailed, $numSkipped]));
+      $allTestsPassed = ($specReport->numFailed === 0);
 
+      tell(sprintf("Ran a total of %d specs, ", $numTests) . implode(', ', [$numPassed, $numFailed, $numSkipped]));
       tell(sprintf("Runner finished in \033[\033[1;33m%s\033[0m seconds.", round($specReport->timeElapsed, 6)));
 
     break;
 
   }
 
-} catch (\Exception $e) {
+} catch(\Exception $exception) {
 
-  send($e->getMessage());
-  exit(1);
+  tell("Spec runner exited due to exception thrown.");
+  send(sprintf("  ⌊  \033[\033[1;31m%s\033[0m: %s (%s:%d)", get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+  exit;
 
 } finally {
 
-  if($allTestsPassed) {
+  if($allTestsPassed === true) {
 
-    exit(0);
+    tell("Spec suite \033[\033[1;32mpassed\033[0m, all tests are OK.");
 
   } else {
 
-    exit(1);
+    tell("Spec suite \033[\033[1;31mfailed\033[0m, at least one test failed.");
 
   }
+
+  exit;
 
 }

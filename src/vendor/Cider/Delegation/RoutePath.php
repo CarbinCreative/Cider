@@ -14,9 +14,6 @@ namespace Cider\Delegation;
 /* Deny direct file access */
 if(!defined('CIDER_ROOT_PATH')) exit;
 
-/* @imports */
-use Cider\Exception\OverflowException;
-
 /**
  *  RoutePath
  *
@@ -107,13 +104,13 @@ class RoutePath {
   }
 
   /**
-   *  route
+   *  path
    *
-   *  Returns pattern path string.
+   *  Returns route path string.
    *
    *  @return string
    */
-  public function route():String {
+  public function path():String {
 
     return $this->patternPath;
 
@@ -122,7 +119,7 @@ class RoutePath {
   /**
    *  pattern
    *
-   *  Returns pattern regex string.
+   *  Returns route pattern regex string.
    *
    *  @return string
    */
@@ -167,17 +164,13 @@ class RoutePath {
    *
    *  @param callable $routeMiddleware
    *
-   *  @throws \Cider\Exception\OverflowException
-   *
    *  @return void
    */
   public function attachMiddleware(Callable $routeMiddleware) {
 
-    $this->middlewares[] = $routeMiddleware;
+    if(count($this->middlewares) < $this->getMaxMiddlewares()) {
 
-    if(count($this->middlewares) > $this->getMaxMiddlewares()) {
-
-      throw new OverflowException('Maximum middlewares per route exceeded.');
+      $this->middlewares[] = $routeMiddleware;
 
     }
 
@@ -197,6 +190,32 @@ class RoutePath {
     $this->attachMiddleware($routeMiddleware);
 
     return $this;
+
+  }
+
+  /**
+   *  flushMiddlewares
+   *
+   *  Removes all attached route middlewares.
+   *
+   *  @return void
+   */
+  public function flushMiddlewares() {
+
+    $this->middlewares = [];
+
+  }
+
+  /**
+   *  numberOfMiddlewares
+   *
+   *  Returns number of middlewares attached.
+   *
+   *  @return int
+   */
+  public function numberOfMiddlewares():Int {
+
+    return count($this->middlewares);
 
   }
 
@@ -248,6 +267,21 @@ class RoutePath {
     $this->afterCallback = $routeAfterCallback;
 
     return $this;
+
+  }
+
+  /**
+   *  flushCallbacks
+   *
+   *  Removes all attached route callbacks (except route handler).
+   *
+   *  @return void
+   */
+  public function flushCallbacks() {
+
+    $this->flushMiddlewares();
+    $this->beforeCallback = null;
+    $this->afterCallback = null;
 
   }
 
@@ -375,7 +409,7 @@ class RoutePath {
 
     if($this->parameterExists($parameterName) === true) {
 
-      return $this->getParamerer($parameterName) === $expectedParameterData;
+      return $this->getParameter($parameterName) === $expectedParameterData;
 
     }
 
@@ -567,6 +601,12 @@ class RoutePath {
    */
   protected function invokeMiddlewares($request, String $response):Array {
 
+    if(count($this->middlewares) === 0) {
+
+      return [$request, $response];
+
+    }
+
     foreach($this->middlewares as $index => $middleware) {
 
       if(array_key_exists($index + 1, $this->middlewares) === true) {
@@ -594,11 +634,15 @@ class RoutePath {
 
     list($request, $response) = $this->invokeBeforeCallback($this, '');
 
-    $response = call_user_func_array($this->callback, array_merge([$request, $response], $this->parameters));
+    $response .= call_user_func_array($this->callback, array_merge([$request, $response], $this->parameters));
 
-    list($request, $response) = $this->invokeMiddlewares($request, $response);
+    if($this->numberOfMiddlewares() > 0) {
 
-    list($request, $response) = $this->invokeAfterCallback($request, $response);
+      list($request, $response) = $this->invokeMiddlewares($request, $response);
+
+    }
+
+    list($request, $response) = $this->invokeAfterCallback($request, $response ?? '');
 
     return $response;
 

@@ -39,7 +39,7 @@ describe('Cider\Common\Store', function() {
 
   });
 
-  it('replaces data store with Store::$data setter', function() use ($store, $gothamVillainsDict) {
+  it('replaces data store with Store::$data setter', function() use ($store, $gothamVillainsDict, $helloWorldDict) {
 
     $store->data = $gothamVillainsDict;
 
