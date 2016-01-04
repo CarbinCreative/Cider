@@ -19,13 +19,14 @@ describe('Cider\Delegation\RoutePath', function() {
 
   beforeEach(function() use ($route) {
 
-    $route->flushCallbacks();
+    $route->removeMiddlewares();
+    $route->removeBeforeAndAfterCallbacks();
 
   });
 
   it('expects defined pattern to be /greet', function() use ($route) {
 
-    return expect($route->path())->toEqual('/greet');
+    return expect($route->pattern())->toEqual('/greet');
 
   });
 
@@ -37,15 +38,18 @@ describe('Cider\Delegation\RoutePath', function() {
 
   it('has no middlewares attached', function() use ($route) {
 
-    return expect($route->numberOfMiddlewares())->toEqual(0);
+    $numberOfMiddlewares = count($route->getMiddlewares());
+
+    return expect($numberOfMiddlewares)->toEqual(0);
 
   });
 
   it('can attach at least one middleware', function() use ($route) {
 
-    $initialMiddlewareCount = $route->numberOfMiddlewares();
+    $initialMiddlewareCount = count($route->getMiddlewares());
     $route->middleware(function($request, $response) {});
-    $hasIncrementedMiddlewareCount = $route->numberOfMiddlewares() > $initialMiddlewareCount;
+    $numberOfMiddlewares = count($route->getMiddlewares());
+    $hasIncrementedMiddlewareCount = $numberOfMiddlewares > $initialMiddlewareCount;
 
     return expect($hasIncrementedMiddlewareCount)->toBeTrue();
 
@@ -59,7 +63,9 @@ describe('Cider\Delegation\RoutePath', function() {
       ->middleware(function() {})
       ->middleware(function() {});
 
-    return expect($route->numberOfMiddlewares())->toEqual(1);
+    $numberOfMiddlewares = count($route->getMiddlewares());
+
+    return expect($numberOfMiddlewares)->toEqual(1);
 
   });
 
@@ -125,10 +131,10 @@ describe('Cider\Delegation\RoutePath', function() {
 
   it('should set named parameter to "bruce.wayne"', function() use ($routeHandler) {
 
-    $namedRoute = new \Cider\Delegation\RoutePath("/users/:user", $routeHandler);
-    $namedRoute->matches("/users/bruce.wayne");
+    $parameterRoute = new \Cider\Delegation\RoutePath("/users/:user", $routeHandler);
+    $parameterRoute->matches("/users/bruce.wayne");
 
-    return expect($namedRoute->parameterMatches('user', 'bruce.wayne'))->toBeTrue();
+    return expect($parameterRoute->parameterMatches('user', 'bruce.wayne'))->toBeTrue();
 
   });
 
@@ -149,6 +155,25 @@ describe('Cider\Delegation\RoutePath', function() {
     $hasRouteMatch = $conditionRoute->matches("/users/brewz-weyn");
 
     return expect($hasRouteMatch)->toBeFalse();
+
+  });
+
+  it('captures greedy parameters', function() use ($routeHandler) {
+
+    $greedyParameterRoute = new \Cider\Delegation\RoutePath("/users/:usernames+", $routeHandler);
+    $greedyParameterRoute->matches('/users/foo/bar/baz');
+
+    return expect($greedyParameterRoute->getParameter('usernames'))->toEqual(['foo', 'bar', 'baz']);
+
+  });
+
+  it('matches optional parameters', function() use ($routeHandler) {
+
+    $optionalParameterRoute = new \Cider\Delegation\RoutePath("/users/:user?", $routeHandler);
+    $matchWithoutOptionalParameter = $optionalParameterRoute->matches('/users/');
+    $matchWithOptionalParameter = $optionalParameterRoute->matches('/users/harley.quinn');
+
+    return expect()->each($matchWithoutOptionalParameter, $matchWithOptionalParameter)->toBeTrue();
 
   });
 

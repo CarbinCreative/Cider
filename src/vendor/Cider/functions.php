@@ -18,14 +18,17 @@ if(!defined('CIDER_ROOT_PATH')) exit;
 require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions', 'FrameworkException.php']);
 require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions', 'FileNotFoundException.php']);
 require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Exceptions', 'BadMethodCallException.php']);
-require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Spec', 'Expectation.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Spec', 'Expectations.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Spec', 'Expects.php']);
+require_once implode(DIRECTORY_SEPARATOR, [rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR), 'src', 'vendor', 'Cider', 'Spec', 'ExpectsAll.php']);
 
 /* @imports */
 use RegexIterator;
 use RecursiveRegexIterator;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-use \Cider\Spec\Expectation;
+use \Cider\Spec\Expects;
+use \Cider\Spec\ExpectsAll;
 use \Cider\Exceptions\FileNotFoundException;
 
 /**
@@ -250,10 +253,10 @@ function slugify(String $unresolvedString, String $wordDelimiter = '-', Array $w
  *
  *  @param mixed $actual
  *
- *  @return \Cider\Spec\Expectation
+ *  @return \Cider\Spec\Expects
  */
-function expect($actual):Expectation {
+function expect($actual = null):Expects {
 
-  return new Expectation($actual);
+  return new Expects($actual);
 
 }

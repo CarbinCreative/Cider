@@ -14,13 +14,10 @@ namespace Cider\Spec;
 /* Deny direct file access */
 if(!defined('CIDER_ROOT_PATH')) exit;
 
-/* @imports */
-use \Cider\Exceptions\BadMethodCallException;
-
 /**
- *  Expectation
+ *  Expects
  *
- *  Light weight axpectation assertion library.
+ *  Lightweight expectation library.
  *
  *  @vendor Cider
  *  @package Spec
@@ -29,7 +26,28 @@ use \Cider\Exceptions\BadMethodCallException;
  *
  *  @author Carbin Creative <hej@carbin.se>
  */
-class Expectation {
+class Expects implements Expectations {
+
+  /**
+   *  @const array VALID_OBJECT_TYPES
+   */
+  const VALID_OBJECT_TYPES = [
+    'array',
+    'bool',
+    'callable',
+    'double',
+    'float',
+    'int',
+    'integer',
+    'long',
+    'null',
+    'numeric',
+    'object',
+    'real',
+    'resource',
+    'scalar',
+    'string'
+  ];
 
   /**
    *  @var mixed $actual
@@ -39,11 +57,13 @@ class Expectation {
   /**
    *  Constructor
    *
-   *  Sets {@see \Cider\Spec\Assertion::$actual}.
+   *  Sets {@see \Cider\Spec\Expect::$actual}.
+   *
+   *  @param mixed $actual
    *
    *  @return void
    */
-  public function __construct($actual) {
+  public function __construct($actual = null) {
 
     $this->actual = $actual;
 
@@ -66,14 +86,14 @@ class Expectation {
 
   }
 
+  public function each(...$actuals):ExpectsAll {
+
+    return new ExpectsAll(...$actuals);
+
+  }
+
   /**
-   *  toEqual
-   *
-   *  Expect actual to be exact match to expected.
-   *
-   *  @param mixed $obj
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toEqual
    */
   public function toEqual($expected):Bool {
 
@@ -82,13 +102,7 @@ class Expectation {
   }
 
   /**
-   *  notToEqual
-   *
-   *  Expect actual not to match expected.
-   *
-   *  @param mixed $obj
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::notToEqual
    */
   public function notToEqual($expected):Bool {
 
@@ -97,13 +111,7 @@ class Expectation {
   }
 
   /**
-   *  toEqualAny
-   *
-   *  Expect actual to match at least one expectation.
-   *
-   *  @param mixed $expectations, ...
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toEqualAny
    */
   public function toEqualAny(...$expectations):Bool {
 
@@ -122,13 +130,7 @@ class Expectation {
   }
 
   /**
-   *  notToEqualAny
-   *
-   *  Expect actual not to match any expectation.
-   *
-   *  @param mixed $expectations, ...
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::notToEqualAny
    */
   public function notToEqualAny(...$expectations):Bool {
 
@@ -137,13 +139,7 @@ class Expectation {
   }
 
   /**
-   *  toEqualAll
-   *
-   *  Expect actual to match all expectations.
-   *
-   *  @param mixed $expectations, ...
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toEqualAll
    */
   public function toEqualAll(...$expectations):Bool {
 
@@ -162,13 +158,7 @@ class Expectation {
   }
 
   /**
-   *  notToEqualAll
-   *
-   *  Expect actual not to match all expections.
-   *
-   *  @param mixed $expectations, ...
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::notToEqualAll
    */
   public function notToEqualAll(...$expectations):Bool {
 
@@ -177,11 +167,7 @@ class Expectation {
   }
 
   /**
-   *  toBeTrue
-   *
-   *  Expect actual to be explicit true.
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toBeTrue
    */
   public function toBeTrue():Bool {
 
@@ -190,11 +176,7 @@ class Expectation {
   }
 
   /**
-   *  toBeTruthy
-   *
-   *  Expect actual to be anything but falsy, {@see \Cider\Spec\Assertion::falsy}.
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toBeTruthy
    */
   public function toBeTruthy():Bool {
 
@@ -203,11 +185,7 @@ class Expectation {
   }
 
   /**
-   *  toBeFalse
-   *
-   *  Expect actual to be explicit false.
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toBeFalse
    */
   public function toBeFalse():Bool {
 
@@ -216,11 +194,7 @@ class Expectation {
   }
 
   /**
-   *  toBeFalsy
-   *
-   *  Expect actual to be falsy.
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toBeFalsy
    */
   public function toBeFalsy():Bool {
 
@@ -229,13 +203,7 @@ class Expectation {
   }
 
   /**
-   *  toSatisfy
-   *
-   *  Expect actual to return true from callback.
-   *
-   *  @param callable $callback
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::toSatisfy
    */
   public function toSatisfy(Callable $callback, ...$callbackArguments):Bool {
 
@@ -244,13 +212,7 @@ class Expectation {
   }
 
   /**
-   *  instanceOf
-   *
-   *  Expects actual to be instance of expected.
-   *
-   *  @param string $expected
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::instanceOf
    */
   public function instanceOf($expected):Bool {
 
@@ -259,35 +221,11 @@ class Expectation {
   }
 
   /**
-   *  typeOf
-   *
-   *  Expects actual to be type of expected.
-   *
-   *  @param string $expected
-   *
-   *  @return bool
+   *  @see \Cider\Spec\Expects::typeOf
    */
   public function typeOf(String $expected):Bool {
 
-    $validObjectTypes = [
-      'array',
-      'bool',
-      'callable',
-      'double',
-      'float',
-      'int',
-      'integer',
-      'long',
-      'null',
-      'numeric',
-      'object',
-      'real',
-      'resource',
-      'scalar',
-      'string'
-    ];
-
-    if($this->expect($expected)->toEqualAny(...$validObjectTypes) === true) {
+    if($this->expect($expected)->toEqualAny(...self::VALID_OBJECT_TYPES) === true) {
 
       return $this->toSatisfy("is_{$expected}");
 
