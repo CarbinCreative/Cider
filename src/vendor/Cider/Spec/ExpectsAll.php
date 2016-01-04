@@ -62,8 +62,6 @@ class ExpectsAll implements Expectations {
 
     $allExpectations = array_map(function($actual) use ($expectCallback, $expectCallbackArguments) {
 
-      var_dump($expectCallback, $expectCallbackArguments);
-
       return call_user_func_array([new Expects($actual), $expectCallback], $expectCallbackArguments);
 
     }, $this->actuals);
