@@ -28,26 +28,26 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  */
 class Kernel {
 
-  /* @mixins */
-  use Common\Singleton;
-  use Common\Mutable;
-  use Common\Factory;
-  use Event\Emitter;
+	/* @mixins */
+	use Common\Singleton;
+	use Common\Mutable;
+	use Common\Factory;
+	use Event\Emitter;
 
-  /**
-   *  signal
-   *
-   *  Alias for {@see Cider\Event\Emitter::emit}.
-   *
-   *  @param string $eventType
-   *  @param mixed $eventTypeCallbackArguments, ...
-   *
-   *  @return bool
-   */
-  public function signal(String $eventType, ...$eventTypeCallbackArguments):Bool {
+	/**
+	 *  signal
+	 *
+	 *  Alias for {@see Cider\Event\Emitter::emit}.
+	 *
+	 *  @param string $eventType
+	 *  @param mixed $eventTypeCallbackArguments, ...
+	 *
+	 *  @return bool
+	 */
+	public function signal(String $eventType, ...$eventTypeCallbackArguments):Bool {
 
-    return $this->emit($eventType, ...$eventTypeCallbackArguments);
+		return $this->emit($eventType, ...$eventTypeCallbackArguments);
 
-  }
+	}
 
 }

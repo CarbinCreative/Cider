@@ -32,40 +32,40 @@ use \Cider\Exceptions\BadMethodCallException;
  */
 trait Factory {
 
-  /**
-   *  initialize
-   *
-   *  Creates a new reflection instance of input class.
-   *
-   *  @param string $className
-   *  @param string $instanceName
-   *  @param string $classMethodName
-   *  @param mixed $classMethodArguments, ...
-   *
-   *  @throws \Cider\Exceptions\BadMethodCallException
-   *
-   *  @return instance
-   */
-  public function initialize(String $className, String $instanceName, String $classMethodName = null, ...$classMethodArguments) {
+	/**
+	 *  initialize
+	 *
+	 *  Creates a new reflection instance of input class.
+	 *
+	 *  @param string $className
+	 *  @param string $instanceName
+	 *  @param string $classMethodName
+	 *  @param mixed $classMethodArguments, ...
+	 *
+	 *  @throws \Cider\Exceptions\BadMethodCallException
+	 *
+	 *  @return instance
+	 */
+	public function initialize(String $className, String $instanceName, String $classMethodName = null, ...$classMethodArguments) {
 
-    if($this->get($instanceName) !== null) {
+		if($this->get($instanceName) !== null) {
 
-      throw new BadMethodCallException('Instance already initialized.');
+			throw new BadMethodCallException('Instance already initialized.');
 
-    }
+		}
 
-    $classInstance = call_user_func_array(
-      [
-        new ReflectionClass($className),
-        $classMethodName ?? 'newInstance'
-      ],
-      $classMethodArguments
-    );
+		$classInstance = call_user_func_array(
+			[
+				new ReflectionClass($className),
+				$classMethodName ?? 'newInstance'
+			],
+			$classMethodArguments
+		);
 
-    $this->set($instanceName, $classInstance);
+		$this->set($instanceName, $classInstance);
 
-    return $classInstance;
+		return $classInstance;
 
-  }
+	}
 
 }

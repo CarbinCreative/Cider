@@ -28,55 +28,55 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  */
 trait Singleton {
 
-  /**
-   *  @staticvar self $__instance
-   */
-  protected static $__instance;
+	/**
+	 *  @staticvar self $__instance
+	 */
+	protected static $__instance;
 
-  /**
-   *  getInstance
-   *
-   *  Returns self initialized instance.
-   *
-   *  @return self
-   */
-  public static function getInstance():self {
+	/**
+	 *  getInstance
+	 *
+	 *  Returns self initialized instance.
+	 *
+	 *  @return self
+	 */
+	public static function getInstance():self {
 
-    if(is_object(self::$__instance) === false) {
+		if(is_object(self::$__instance) === false) {
 
-      self::$__instance = new self;
+			self::$__instance = new self;
 
-    }
+		}
 
-    return self::$__instance;
+		return self::$__instance;
 
-  }
+	}
 
-  /**
-   *  Constructor
-   *
-   *  Initialization disabled via 'final' and 'private' keywords.
-   *
-   *  @return void
-   */
-  final private function __construct() {}
+	/**
+	 *  Constructor
+	 *
+	 *  Initialization disabled via 'final' and 'private' keywords.
+	 *
+	 *  @return void
+	 */
+	final private function __construct() {}
 
-  /**
-   *  __wakeup
-   *
-   *  Class unserialization disabled via 'final' and 'private' keywords.
-   *
-   *  @return void
-   */
-  final private function __wakeup() {}
+	/**
+	 *  __wakeup
+	 *
+	 *  Class unserialization disabled via 'final' and 'private' keywords.
+	 *
+	 *  @return void
+	 */
+	final private function __wakeup() {}
 
-  /**
-   *  __clone
-   *
-   *  Class cloning disabled via 'final' and 'private' keywords.
-   *
-   *  @return void
-   */
-  final private function __clone() {}
+	/**
+	 *  __clone
+	 *
+	 *  Class cloning disabled via 'final' and 'private' keywords.
+	 *
+	 *  @return void
+	 */
+	final private function __clone() {}
 
 }

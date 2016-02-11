@@ -34,49 +34,49 @@ $outputBuffer = null;
 /* Run the application */
 try {
 
-  /* Load version file */
-  require_once CIDER_ROOT_PATH . 'version.php';
+	/* Load version file */
+	require_once CIDER_ROOT_PATH . 'version.php';
 
-  /* Load Cider bootstrap */
-  require_once implode(DIRECTORY_SEPARATOR, [
-    rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR),
-    'src', 'vendor', 'Cider', 'bootstrap.php'
-  ]);
+	/* Load Cider bootstrap */
+	require_once implode(DIRECTORY_SEPARATOR, [
+		rtrim(CIDER_ROOT_PATH, DIRECTORY_SEPARATOR),
+		'src', 'vendor', 'Cider', 'bootstrap.php'
+	]);
 
-  ob_start();
+	ob_start();
 
-  /* Resolve HTTP request */
-  app()->http->resolve();
+	/* Resolve HTTP request */
+	app()->http->resolve();
 
-  /* Load optional app bootstrap */
-  relativeRequire('app/bootstrap');
+	/* Load optional app bootstrap */
+	relativeRequire('app/bootstrap');
 
-  /* Load routes */
-  relativeRequire('app/routes');
+	/* Load routes */
+	relativeRequire('app/routes');
 
-  /* @emits "rendering" */
-  app()->signal('rendering');
+	/* @emits "rendering" */
+	app()->signal('rendering');
 
-  /* Dispatch current request URI */
-  echo dispatcher()->dispatch(uri());
+	/* Dispatch current request URI */
+	echo dispatcher()->dispatch(uri());
 
-  /* Capture buffer */
-  $outputBuffer = ob_get_clean();
+	/* Capture buffer */
+	$outputBuffer = ob_get_clean();
 
 } catch (\Exception $exception) {
 
-  /* Dispatch generic exceptions */
-  $outputBuffer = dispatcher()->dispatchError($exception);
+	/* Dispatch generic exceptions */
+	$outputBuffer = dispatcher()->dispatchError($exception);
 
 } finally {
 
-  /* Send HTTP headers */
-  app()->http->sendHeaders();
+	/* Send HTTP headers */
+	app()->http->sendHeaders();
 
-  /* Send output */
-  echo $outputBuffer;
+	/* Send output */
+	echo $outputBuffer;
 
-  /* @emits "rendered" */
-  app()->signal('rendered');
+	/* @emits "rendered" */
+	app()->signal('rendered');
 
 }

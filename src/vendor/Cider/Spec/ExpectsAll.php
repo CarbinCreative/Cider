@@ -28,165 +28,165 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  */
 class ExpectsAll implements Expectations {
 
-  /**
-   *  @var mixed $actuals
-   */
-  protected $actuals;
+	/**
+	 *  @var mixed $actuals
+	 */
+	protected $actuals;
 
-  /**
-   *  Constructor
-   *
-   *  Sets {@see \Cider\Spec\Expect::$actuals}.
-   *
-   *  @param mixed $actuals, ...
-   *
-   *  @return void
-   */
-  public function __construct(...$actuals) {
+	/**
+	 *  Constructor
+	 *
+	 *  Sets {@see \Cider\Spec\Expect::$actuals}.
+	 *
+	 *  @param mixed $actuals, ...
+	 *
+	 *  @return void
+	 */
+	public function __construct(...$actuals) {
 
-    $this->actuals = $actuals;
+		$this->actuals = $actuals;
 
-  }
+	}
 
-  /**
-   *  each
-   *
-   *  Maps all actuals to match expectation.
-   *
-   *  @param callable $expectCallback
-   *  @param mixed $expectCallbackArguments, ...
-   *
-   *  @return bool
-   */
-  protected function each($expectCallback, ...$expectCallbackArguments):Bool {
+	/**
+	 *  each
+	 *
+	 *  Maps all actuals to match expectation.
+	 *
+	 *  @param callable $expectCallback
+	 *  @param mixed $expectCallbackArguments, ...
+	 *
+	 *  @return bool
+	 */
+	protected function each($expectCallback, ...$expectCallbackArguments):Bool {
 
-    $allExpectations = array_map(function($actual) use ($expectCallback, $expectCallbackArguments) {
+		$allExpectations = array_map(function($actual) use ($expectCallback, $expectCallbackArguments) {
 
-      return call_user_func_array([new Expects($actual), $expectCallback], $expectCallbackArguments);
+			return call_user_func_array([new Expects($actual), $expectCallback], $expectCallbackArguments);
 
-    }, $this->actuals);
+		}, $this->actuals);
 
-    $uniqueExpectations = array_unique($allExpectations);
+		$uniqueExpectations = array_unique($allExpectations);
 
-    return (count($uniqueExpectations) === 1 && end($uniqueExpectations) === true);
+		return (count($uniqueExpectations) === 1 && end($uniqueExpectations) === true);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toEqual
-   */
-  public function toEqual($expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toEqual
+	 */
+	public function toEqual($expected):Bool {
 
-    return $this->each('toEqual', $expected);
+		return $this->each('toEqual', $expected);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::notToEqual
-   */
-  public function notToEqual($expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::notToEqual
+	 */
+	public function notToEqual($expected):Bool {
 
-    return $this->each('notToEqual', $expected);
+		return $this->each('notToEqual', $expected);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toEqualAny
-   */
-  public function toEqualAny(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toEqualAny
+	 */
+	public function toEqualAny(...$expectations):Bool {
 
-    return $this->each('toEqualAny', ...$expectations);
+		return $this->each('toEqualAny', ...$expectations);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::notToEqualAny
-   */
-  public function notToEqualAny(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::notToEqualAny
+	 */
+	public function notToEqualAny(...$expectations):Bool {
 
-    return $this->each('notToEqualAny', ...$expectations);
+		return $this->each('notToEqualAny', ...$expectations);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toEqualAll
-   */
-  public function toEqualAll(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toEqualAll
+	 */
+	public function toEqualAll(...$expectations):Bool {
 
-    return $this->each('toEqualAll', ...$expectations);
+		return $this->each('toEqualAll', ...$expectations);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::notToEqualAll
-   */
-  public function notToEqualAll(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::notToEqualAll
+	 */
+	public function notToEqualAll(...$expectations):Bool {
 
-    return $this->each('notToEqualAll', ...$expectations);
+		return $this->each('notToEqualAll', ...$expectations);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeTrue
-   */
-  public function toBeTrue():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeTrue
+	 */
+	public function toBeTrue():Bool {
 
-    return $this->each('toBeTrue');
+		return $this->each('toBeTrue');
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeTruthy
-   */
-  public function toBeTruthy():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeTruthy
+	 */
+	public function toBeTruthy():Bool {
 
-    return $this->each('toBeTruthy');
+		return $this->each('toBeTruthy');
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeFalse
-   */
-  public function toBeFalse():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeFalse
+	 */
+	public function toBeFalse():Bool {
 
-    return $this->each('toBeFalse');
+		return $this->each('toBeFalse');
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeFalsy
-   */
-  public function toBeFalsy():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeFalsy
+	 */
+	public function toBeFalsy():Bool {
 
-    return $this->each('toBeFalsy');
+		return $this->each('toBeFalsy');
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toSatisfy
-   */
-  public function toSatisfy(Callable $callback, ...$callbackArguments):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toSatisfy
+	 */
+	public function toSatisfy(Callable $callback, ...$callbackArguments):Bool {
 
-    return $this->each('toSatisfy', $callback, ...$callbackArguments);
+		return $this->each('toSatisfy', $callback, ...$callbackArguments);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::instanceOf
-   */
-  public function instanceOf($expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::instanceOf
+	 */
+	public function instanceOf($expected):Bool {
 
-    return $this->each('instanceOf', $expected);
+		return $this->each('instanceOf', $expected);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::typeOf
-   */
-  public function typeOf(String $expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::typeOf
+	 */
+	public function typeOf(String $expected):Bool {
 
-    return $this->each('typeOf', $expected);
+		return $this->each('typeOf', $expected);
 
-  }
+	}
 
 }

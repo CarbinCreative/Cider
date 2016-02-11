@@ -27,7 +27,7 @@ use \Cider\Delegation\Dispatcher;
  */
 function app():Kernel {
 
-  return Kernel::getInstance();
+	return Kernel::getInstance();
 
 }
 
@@ -40,7 +40,7 @@ function app():Kernel {
  */
 function route():RouteMap {
 
-  return Kernel::getInstance()->routeMap;
+	return Kernel::getInstance()->routeMap;
 
 }
 
@@ -53,6 +53,6 @@ function route():RouteMap {
  */
 function dispatcher():Dispatcher {
 
-  return Kernel::getInstance()->dispatcher;
+	return Kernel::getInstance()->dispatcher;
 
 }

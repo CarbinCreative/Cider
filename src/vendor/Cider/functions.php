@@ -44,20 +44,20 @@ use \Cider\Exceptions\FileNotFoundException;
  */
 function path(String $unresolvedPath, Bool $appendDirectorySeparator = false, String $pathSeparator = '/'):String {
 
-  $resolvedPath = preg_replace('#' . $pathSeparator . '+#', $pathSeparator, trim($unresolvedPath, $pathSeparator));
+	$resolvedPath = preg_replace('#' . $pathSeparator . '+#', $pathSeparator, trim($unresolvedPath, $pathSeparator));
 
-  $resolvedPath = implode('', [
-    CIDER_ROOT_PATH,
-    trim(str_replace($pathSeparator, DIRECTORY_SEPARATOR, trim($resolvedPath, $pathSeparator)), DIRECTORY_SEPARATOR)
-  ]);
+	$resolvedPath = implode('', [
+		CIDER_ROOT_PATH,
+		trim(str_replace($pathSeparator, DIRECTORY_SEPARATOR, trim($resolvedPath, $pathSeparator)), DIRECTORY_SEPARATOR)
+	]);
 
-  if($appendDirectorySeparator === true) {
+	if($appendDirectorySeparator === true) {
 
-    $resolvedPath .= DIRECTORY_SEPARATOR;
+		$resolvedPath .= DIRECTORY_SEPARATOR;
 
-  }
+	}
 
-  return $resolvedPath;
+	return $resolvedPath;
 
 }
 
@@ -75,25 +75,25 @@ function path(String $unresolvedPath, Bool $appendDirectorySeparator = false, St
  */
 function relativeRequire(String $relativeRequirePath, Bool $throwException = false):Bool {
 
-  $resolvedRequirePath = path($relativeRequirePath);
+	$resolvedRequirePath = path($relativeRequirePath);
 
-  if(substr($resolvedRequirePath, -4) !== '.php') {
+	if(substr($resolvedRequirePath, -4) !== '.php') {
 
-    $resolvedRequirePath .= '.php';
+		$resolvedRequirePath .= '.php';
 
-  }
+	}
 
-  if(file_exists($resolvedRequirePath) === true) {
+	if(file_exists($resolvedRequirePath) === true) {
 
-    require_once $resolvedRequirePath;
+		require_once $resolvedRequirePath;
 
-  } else if($throwException === true) {
+	} else if($throwException === true) {
 
-    throw new FileNotFoundException("File {$resolvedRequirePath} does not exist.");
+		throw new FileNotFoundException("File {$resolvedRequirePath} does not exist.");
 
-  }
+	}
 
-  return false;
+	return false;
 
 }
 
@@ -108,35 +108,35 @@ function relativeRequire(String $relativeRequirePath, Bool $throwException = fal
  */
 function import(String $unresolvedNamespace, String $includePathPrefix = null):Int {
 
-  $includePathPrefix = $includePathPrefix ?? 'src/vendor/';
-  $namespaceDirectoryPath = str_replace(NAMESPACE_SEPARATOR, DIRECTORY_SEPARATOR, $unresolvedNamespace);
-  $resolvedNamespaceIncludePath = implode([$includePathPrefix, $namespaceDirectoryPath]);
+	$includePathPrefix = $includePathPrefix ?? 'src/vendor/';
+	$namespaceDirectoryPath = str_replace(NAMESPACE_SEPARATOR, DIRECTORY_SEPARATOR, $unresolvedNamespace);
+	$resolvedNamespaceIncludePath = implode([$includePathPrefix, $namespaceDirectoryPath]);
 
-  if(substr($unresolvedNamespace, -1) === '*') {
+	if(substr($unresolvedNamespace, -1) === '*') {
 
-    $regexDirectoryIterator = new RegexIterator(
-      new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator(substr($resolvedNamespaceIncludePath, 0, -1))
-      ),
-      '/^.+[A-Z][a-z]+\.php$/',
-      RecursiveRegexIterator::GET_MATCH
-    );
+		$regexDirectoryIterator = new RegexIterator(
+			new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator(substr($resolvedNamespaceIncludePath, 0, -1))
+			),
+			'/^.+[A-Z][a-z]+\.php$/',
+			RecursiveRegexIterator::GET_MATCH
+		);
 
-    $includePaths = array_keys(iterator_to_array($regexDirectoryIterator));
+		$includePaths = array_keys(iterator_to_array($regexDirectoryIterator));
 
-  } else {
+	} else {
 
-    $includePaths = [$resolvedNamespaceIncludePath];
+		$includePaths = [$resolvedNamespaceIncludePath];
 
-  }
+	}
 
-  foreach($includePaths as $includePath) {
+	foreach($includePaths as $includePath) {
 
-    relativeRequire($includePath, true);
+		relativeRequire($includePath, true);
 
-  }
+	}
 
-  return count($includePaths);
+	return count($includePaths);
 
 }
 
@@ -151,34 +151,34 @@ function import(String $unresolvedNamespace, String $includePathPrefix = null):I
  */
 function url(Bool $omitRequestPath = false):String {
 
-  $sslSuffix = (empty($_SERVER['HTTPS']) === true) ? '' : (strtolower($_SERVER['HTTPS']) === 'on') ? 's' : '';
+	$sslSuffix = (empty($_SERVER['HTTPS']) === true) ? '' : (strtolower($_SERVER['HTTPS']) === 'on') ? 's' : '';
 
-  $protocol = strtolower($_SERVER['SERVER_PROTOCOL']);
-  $protocol = substr($protocol, 0, strpos($protocol, '/')) . $sslSuffix;
+	$protocol = strtolower($_SERVER['SERVER_PROTOCOL']);
+	$protocol = substr($protocol, 0, strpos($protocol, '/')) . $sslSuffix;
 
-  $port = (intval($_SERVER['SERVER_PORT']) === 80) ? '' : (':' . $_SERVER['SERVER_PORT']);
+	$port = (intval($_SERVER['SERVER_PORT']) === 80) ? '' : (':' . $_SERVER['SERVER_PORT']);
 
-  $resolvedUrl = implode('', [
-    $protocol,
-    '://',
-    $_SERVER['SERVER_NAME'],
-    $port,
-    $_SERVER['REQUEST_URI']
-  ]);
+	$resolvedUrl = implode('', [
+		$protocol,
+		'://',
+		$_SERVER['SERVER_NAME'],
+		$port,
+		$_SERVER['REQUEST_URI']
+	]);
 
-  if($omitRequestPath === true) {
+	if($omitRequestPath === true) {
 
-    $resolvedUrl = implode('', [
-      $protocol,
-      '://',
-      $_SERVER['SERVER_NAME'],
-      $port,
-      dirname($_SERVER['SCRIPT_NAME'])
-    ]);
+		$resolvedUrl = implode('', [
+			$protocol,
+			'://',
+			$_SERVER['SERVER_NAME'],
+			$port,
+			dirname($_SERVER['SCRIPT_NAME'])
+		]);
 
-  }
+	}
 
-  return $resolvedUrl;
+	return $resolvedUrl;
 
 }
 
@@ -193,28 +193,28 @@ function url(Bool $omitRequestPath = false):String {
  */
 function uri(String $unresolvedUri = null):String {
 
-  if($unresolvedUri === null) {
+	if($unresolvedUri === null) {
 
-    $requestUri = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
-    $scriptName = explode('/', trim($_SERVER['SCRIPT_NAME'], '/'));
+		$requestUri = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+		$scriptName = explode('/', trim($_SERVER['SCRIPT_NAME'], '/'));
 
-    $segments = array_diff_assoc($requestUri, $scriptName);
-    $segments = array_filter($segments);
+		$segments = array_diff_assoc($requestUri, $scriptName);
+		$segments = array_filter($segments);
 
-    if(empty($segments) === true) {
+		if(empty($segments) === true) {
 
-      return '/';
+			return '/';
 
-    }
+		}
 
-    $uriPath = implode('/', $segments);
-    $uriPath = parse_url($uriPath, PHP_URL_PATH);
+		$uriPath = implode('/', $segments);
+		$uriPath = parse_url($uriPath, PHP_URL_PATH);
 
-  return $uriPath;
+	return $uriPath;
 
-  }
+	}
 
-  return preg_replace('#/+#', '/', trim(slugify($unresolvedUri), '/'));
+	return preg_replace('#/+#', '/', trim(slugify($unresolvedUri), '/'));
 
 }
 
@@ -231,18 +231,18 @@ function uri(String $unresolvedUri = null):String {
  */
 function slugify(String $unresolvedString, String $wordDelimiter = '-', Array $wordReplacements = []):String {
 
-  if(count($wordReplacements) > 0) {
+	if(count($wordReplacements) > 0) {
 
-    $unresolvedString = str_ireplace($wordReplacements, ' ', $unresolvedString);
+		$unresolvedString = str_ireplace($wordReplacements, ' ', $unresolvedString);
 
-  }
+	}
 
-  $resolvedString = iconv('UTF-8', 'ASCII//TRANSLIT', $unresolvedString);
-  $resolvedString = preg_replace("%[^-/+|\w ]%", '', $resolvedString);
-  $resolvedString = strtolower(trim($resolvedString, '-'));
-  $resolvedString = preg_replace("/[\/_|+ -]+/", $wordDelimiter, $resolvedString);
+	$resolvedString = iconv('UTF-8', 'ASCII//TRANSLIT', $unresolvedString);
+	$resolvedString = preg_replace("%[^-/+|\w ]%", '', $resolvedString);
+	$resolvedString = strtolower(trim($resolvedString, '-'));
+	$resolvedString = preg_replace("/[\/_|+ -]+/", $wordDelimiter, $resolvedString);
 
-  return $resolvedString;
+	return $resolvedString;
 
 }
 
@@ -257,6 +257,6 @@ function slugify(String $unresolvedString, String $wordDelimiter = '-', Array $w
  */
 function expect($actual = null):Expects {
 
-  return new Expects($actual);
+	return new Expects($actual);
 
 }

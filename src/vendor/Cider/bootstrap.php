@@ -21,7 +21,7 @@ require_once implode(DIRECTORY_SEPARATOR, [__DIR__, 'helpers.php']);
 /* Register autoloader */
 spl_autoload_register(function($className) {
 
-  return import($className);
+	return import($className);
 
 });
 

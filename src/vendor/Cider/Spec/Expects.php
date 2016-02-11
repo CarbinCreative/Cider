@@ -28,211 +28,211 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  */
 class Expects implements Expectations {
 
-  /**
-   *  @const array VALID_OBJECT_TYPES
-   */
-  const VALID_OBJECT_TYPES = [
-    'array',
-    'bool',
-    'callable',
-    'double',
-    'float',
-    'int',
-    'integer',
-    'long',
-    'null',
-    'numeric',
-    'object',
-    'real',
-    'resource',
-    'scalar',
-    'string'
-  ];
+	/**
+	 *  @const array VALID_OBJECT_TYPES
+	 */
+	const VALID_OBJECT_TYPES = [
+		'array',
+		'bool',
+		'callable',
+		'double',
+		'float',
+		'int',
+		'integer',
+		'long',
+		'null',
+		'numeric',
+		'object',
+		'real',
+		'resource',
+		'scalar',
+		'string'
+	];
 
-  /**
-   *  @var mixed $actual
-   */
-  protected $actual;
+	/**
+	 *  @var mixed $actual
+	 */
+	protected $actual;
 
-  /**
-   *  Constructor
-   *
-   *  Sets {@see \Cider\Spec\Expect::$actual}.
-   *
-   *  @param mixed $actual
-   *
-   *  @return void
-   */
-  public function __construct($actual = null) {
+	/**
+	 *  Constructor
+	 *
+	 *  Sets {@see \Cider\Spec\Expect::$actual}.
+	 *
+	 *  @param mixed $actual
+	 *
+	 *  @return void
+	 */
+	public function __construct($actual = null) {
 
-    $this->actual = $actual;
+		$this->actual = $actual;
 
-  }
+	}
 
-  /**
-   *  expect
-   *
-   *  Sets and returns new instance of {@see \Cider\Spec\Expectation}.
-   *
-   *  @param mixed $actual
-   *
-   *  @return \Cider\Spec\Expectation
-   */
-  protected function expect($actual):self {
+	/**
+	 *  expect
+	 *
+	 *  Sets and returns new instance of {@see \Cider\Spec\Expectation}.
+	 *
+	 *  @param mixed $actual
+	 *
+	 *  @return \Cider\Spec\Expectation
+	 */
+	protected function expect($actual):self {
 
-    $newInstance = new self($actual);
+		$newInstance = new self($actual);
 
-    return $newInstance;
+		return $newInstance;
 
-  }
+	}
 
-  public function each(...$actuals):ExpectsAll {
+	public function each(...$actuals):ExpectsAll {
 
-    return new ExpectsAll(...$actuals);
+		return new ExpectsAll(...$actuals);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toEqual
-   */
-  public function toEqual($expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toEqual
+	 */
+	public function toEqual($expected):Bool {
 
-    return $this->actual === $expected;
+		return $this->actual === $expected;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::notToEqual
-   */
-  public function notToEqual($expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::notToEqual
+	 */
+	public function notToEqual($expected):Bool {
 
-    return $this->toEqual($expected) === false;
+		return $this->toEqual($expected) === false;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toEqualAny
-   */
-  public function toEqualAny(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toEqualAny
+	 */
+	public function toEqualAny(...$expectations):Bool {
 
-    foreach($expectations as $expected) {
+		foreach($expectations as $expected) {
 
-      if($this->toEqual($expected) === true) {
+			if($this->toEqual($expected) === true) {
 
-        return true;
+				return true;
 
-      }
+			}
 
-    }
+		}
 
-    return false;
+		return false;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::notToEqualAny
-   */
-  public function notToEqualAny(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::notToEqualAny
+	 */
+	public function notToEqualAny(...$expectations):Bool {
 
-    return $this->toEqualAny(...$expectations) === false;
+		return $this->toEqualAny(...$expectations) === false;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toEqualAll
-   */
-  public function toEqualAll(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toEqualAll
+	 */
+	public function toEqualAll(...$expectations):Bool {
 
-    foreach($expectations as $expected) {
+		foreach($expectations as $expected) {
 
-      if($this->notToEqual($expected) === true) {
+			if($this->notToEqual($expected) === true) {
 
-        return false;
+				return false;
 
-      }
+			}
 
-    }
+		}
 
-    return true;
+		return true;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::notToEqualAll
-   */
-  public function notToEqualAll(...$expectations):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::notToEqualAll
+	 */
+	public function notToEqualAll(...$expectations):Bool {
 
-    return $this->toEqualAll(...$expectations) === false;
+		return $this->toEqualAll(...$expectations) === false;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeTrue
-   */
-  public function toBeTrue():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeTrue
+	 */
+	public function toBeTrue():Bool {
 
-    return $this->actual === true;
+		return $this->actual === true;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeTruthy
-   */
-  public function toBeTruthy():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeTruthy
+	 */
+	public function toBeTruthy():Bool {
 
-    return $this->toBeFalsy() === false;
+		return $this->toBeFalsy() === false;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeFalse
-   */
-  public function toBeFalse():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeFalse
+	 */
+	public function toBeFalse():Bool {
 
-    return $this->actual === false;
+		return $this->actual === false;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toBeFalsy
-   */
-  public function toBeFalsy():Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toBeFalsy
+	 */
+	public function toBeFalsy():Bool {
 
-    return $this->toEqualAny(false, 0, '', null, NAN);
+		return $this->toEqualAny(false, 0, '', null, NAN);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::toSatisfy
-   */
-  public function toSatisfy(Callable $callback, ...$callbackArguments):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::toSatisfy
+	 */
+	public function toSatisfy(Callable $callback, ...$callbackArguments):Bool {
 
-    return call_user_func_array($callback, [$this->actual] + $callbackArguments) === true;
+		return call_user_func_array($callback, [$this->actual] + $callbackArguments) === true;
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::instanceOf
-   */
-  public function instanceOf($expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::instanceOf
+	 */
+	public function instanceOf($expected):Bool {
 
-    return is_a($this->actual, $expected);
+		return is_a($this->actual, $expected);
 
-  }
+	}
 
-  /**
-   *  @see \Cider\Spec\Expects::typeOf
-   */
-  public function typeOf(String $expected):Bool {
+	/**
+	 *  @see \Cider\Spec\Expects::typeOf
+	 */
+	public function typeOf(String $expected):Bool {
 
-    if($this->expect($expected)->toEqualAny(...self::VALID_OBJECT_TYPES) === true) {
+		if($this->expect($expected)->toEqualAny(...self::VALID_OBJECT_TYPES) === true) {
 
-      return $this->toSatisfy("is_{$expected}");
+			return $this->toSatisfy("is_{$expected}");
 
-    }
+		}
 
-    return false;
+		return false;
 
-  }
+	}
 
 }

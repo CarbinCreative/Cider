@@ -28,748 +28,748 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  */
 class RoutePath {
 
-  /**
-   *  @const string ROUTE_PATTERN_DELIMITER
-   */
-  const ROUTE_PATTERN_DELIMITER = '/';
-
-  /**
-   *  @const string ROUTE_PATTERN_PARAMETER_REGEX
-   */
-  const ROUTE_PATTERN_PARAMETER_REGEX = '~:([\w]+)[\+|\?]?~';
-
-  /**
-   *  @const string ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX
-   */
-  const ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX = '[^/]+';
-
-  /**
-   *  @var string $routeName
-   */
-  protected $routeName;
-
-  /**
-   *  @var string $routePattern
-   */
-  protected $routePattern;
-
-  /**
-   *  @var string $routePatternRegex
-   */
-  protected $routePatternRegex;
-
-  /**
-   *  @var callable $beforeCallback
-   */
-  protected $beforeCallback;
-
-  /**
-   *  @var callable $afterCallback
-   */
-  protected $afterCallback;
-
-  /**
-   *  @var callable $matchCallback
-   */
-  protected $matchCallback;
-
-  /**
-   *  @var array $parameters
-   */
-  protected $parameters = [];
-
-  /**
-   *  @var array $conditions
-   */
-  protected $conditions = [];
-
-  /**
-   *  @var int $maxMiddlewares
-   */
-  protected $maxMiddlewares = 10;
-
-  /**
-   *  @var array $middlewares
-   */
-  protected $middlewares = [];
+	/**
+	 *  @const string ROUTE_PATTERN_DELIMITER
+	 */
+	const ROUTE_PATTERN_DELIMITER = '/';
+
+	/**
+	 *  @const string ROUTE_PATTERN_PARAMETER_REGEX
+	 */
+	const ROUTE_PATTERN_PARAMETER_REGEX = '~:([\w]+)[\+|\?]?~';
+
+	/**
+	 *  @const string ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX
+	 */
+	const ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX = '[^/]+';
+
+	/**
+	 *  @var string $routeName
+	 */
+	protected $routeName;
+
+	/**
+	 *  @var string $routePattern
+	 */
+	protected $routePattern;
+
+	/**
+	 *  @var string $routePatternRegex
+	 */
+	protected $routePatternRegex;
+
+	/**
+	 *  @var callable $beforeCallback
+	 */
+	protected $beforeCallback;
+
+	/**
+	 *  @var callable $afterCallback
+	 */
+	protected $afterCallback;
+
+	/**
+	 *  @var callable $matchCallback
+	 */
+	protected $matchCallback;
+
+	/**
+	 *  @var array $parameters
+	 */
+	protected $parameters = [];
+
+	/**
+	 *  @var array $conditions
+	 */
+	protected $conditions = [];
+
+	/**
+	 *  @var int $maxMiddlewares
+	 */
+	protected $maxMiddlewares = 10;
+
+	/**
+	 *  @var array $middlewares
+	 */
+	protected $middlewares = [];
 
-  /**
-   *  Constructor
-   *
-   *  Sets route pattern, match callback and invokes {@see \Cider\Delegation\RoutePath::update}.
-   *
-   *  @param string $routePattern
-   *  @param callable $routeMatchCallback
-   *
-   *  @return void
-   */
-  public function __construct(String $routePattern, Callable $routeMatchCallback) {
+	/**
+	 *  Constructor
+	 *
+	 *  Sets route pattern, match callback and invokes {@see \Cider\Delegation\RoutePath::update}.
+	 *
+	 *  @param string $routePattern
+	 *  @param callable $routeMatchCallback
+	 *
+	 *  @return void
+	 */
+	public function __construct(String $routePattern, Callable $routeMatchCallback) {
 
-    $this->routePattern = $routePattern;
-
-    $this->matchCallback = $routeMatchCallback;
+		$this->routePattern = $routePattern;
+
+		$this->matchCallback = $routeMatchCallback;
 
-    $this->update();
+		$this->update();
 
-  }
+	}
 
-  /**
-   *  update
-   *
-   *  Updates route path regex.
-   *
-   *  @return void
-   */
-  protected function update() {
-
-    $this->routePatternRegex = $this->compileRoutePathPatternRegex($this->routePattern);
+	/**
+	 *  update
+	 *
+	 *  Updates route path regex.
+	 *
+	 *  @return void
+	 */
+	protected function update() {
+
+		$this->routePatternRegex = $this->compileRoutePathPatternRegex($this->routePattern);
 
-  }
+	}
 
-  /**
-   *  compileRoutePathPatternRegex
-   *
-   *  Compiles a Cider specific route path into valid regex.
-   *
-   *  @param string $routePathPattern
-   *
-   *  @return string
-   */
-  protected function compileRoutePathPatternRegex(String $routePathPattern):String {
+	/**
+	 *  compileRoutePathPatternRegex
+	 *
+	 *  Compiles a Cider specific route path into valid regex.
+	 *
+	 *  @param string $routePathPattern
+	 *
+	 *  @return string
+	 */
+	protected function compileRoutePathPatternRegex(String $routePathPattern):String {
 
-    $routePathPatternRegex = preg_replace_callback(
-      self::ROUTE_PATTERN_PARAMETER_REGEX,
-      [$this, 'compileRouteParameterRegex'],
-      str_replace(')', ')?', $routePathPattern)
-    );
+		$routePathPatternRegex = preg_replace_callback(
+			self::ROUTE_PATTERN_PARAMETER_REGEX,
+			[$this, 'compileRouteParameterRegex'],
+			str_replace(')', ')?', $routePathPattern)
+		);
 
-    if(substr($routePathPattern, -1) === self::ROUTE_PATTERN_DELIMITER) {
+		if(substr($routePathPattern, -1) === self::ROUTE_PATTERN_DELIMITER) {
 
-      $routePathPatternRegex .= '?';
+			$routePathPatternRegex .= '?';
 
-    }
+		}
 
-    $routePathPatternRegex = implode(['~^', $routePathPatternRegex, '$~i']);
+		$routePathPatternRegex = implode(['~^', $routePathPatternRegex, '$~i']);
 
-    return $routePathPatternRegex;
+		return $routePathPatternRegex;
 
-  }
+	}
 
-  /**
-   *  compileRouteParameterRegex
-   *
-   *  Compiles a parameter segment (:foo, :foo? or :foo+) into a named regex capture.
-   *
-   *  @param array $routeParameterMatches
-   *
-   *  @return string
-   */
-  protected function compileRouteParameterRegex(Array $routeParameterMatches):String {
+	/**
+	 *  compileRouteParameterRegex
+	 *
+	 *  Compiles a parameter segment (:foo, :foo? or :foo+) into a named regex capture.
+	 *
+	 *  @param array $routeParameterMatches
+	 *
+	 *  @return string
+	 */
+	protected function compileRouteParameterRegex(Array $routeParameterMatches):String {
 
-    list($routeParameterPattern, $routeParameterName) = $routeParameterMatches;
+		list($routeParameterPattern, $routeParameterName) = $routeParameterMatches;
 
-    $routeParameterRegex = self::ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX;
-    $conditionalParameter = (substr($routeParameterPattern, -1) === '?');
-    $greedyMatchParameter = (substr($routeParameterPattern, -1) === '+');
+		$routeParameterRegex = self::ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX;
+		$conditionalParameter = (substr($routeParameterPattern, -1) === '?');
+		$greedyMatchParameter = (substr($routeParameterPattern, -1) === '+');
 
-    if($this->conditionExists($routeParameterName) === true) {
+		if($this->conditionExists($routeParameterName) === true) {
 
-      $routeParameterRegex = $this->getCondition($routeParameterName);
+			$routeParameterRegex = $this->getCondition($routeParameterName);
 
-    }
+		}
 
-    if($greedyMatchParameter === true) {
+		if($greedyMatchParameter === true) {
 
-      $routeParameterRegex = '.+';
+			$routeParameterRegex = '.+';
 
-    }
+		}
 
-    $routeParameterRegex = "(?P<{$routeParameterName}>{$routeParameterRegex})";
+		$routeParameterRegex = "(?P<{$routeParameterName}>{$routeParameterRegex})";
 
-    if($conditionalParameter === true) {
+		if($conditionalParameter === true) {
 
-      $routeParameterRegex = "?(?:{$routeParameterRegex})?";
+			$routeParameterRegex = "?(?:{$routeParameterRegex})?";
 
-    }
+		}
 
-    return $routeParameterRegex;
+		return $routeParameterRegex;
 
-  }
+	}
 
-  /**
-   *  name
-   *
-   *  Sets route name.
-   *
-   *  @param string $routeName
-   *
-   *  @return self
-   */
-  public function name(String $routeName):self {
+	/**
+	 *  name
+	 *
+	 *  Sets route name.
+	 *
+	 *  @param string $routeName
+	 *
+	 *  @return self
+	 */
+	public function name(String $routeName):self {
 
-    $this->routeName = $routeName;
+		$this->routeName = $routeName;
 
-    return $this;
+		return $this;
 
-  }
+	}
 
-  /**
-   *  pattern
-   *
-   *  Returns route pattern.
-   *
-   *  @return string
-   */
-  public function pattern():String {
+	/**
+	 *  pattern
+	 *
+	 *  Returns route pattern.
+	 *
+	 *  @return string
+	 */
+	public function pattern():String {
 
-    return $this->routePattern;
+		return $this->routePattern;
 
-  }
+	}
 
-  /**
-   *  patternRegex
-   *
-   *  Returns route pattern regex.
-   *
-   *  @return string
-   */
-  public function patternRegex():String {
+	/**
+	 *  patternRegex
+	 *
+	 *  Returns route pattern regex.
+	 *
+	 *  @return string
+	 */
+	public function patternRegex():String {
 
-    return $this->routePatternRegex;
+		return $this->routePatternRegex;
 
-  }
+	}
 
-  /**
-   *  before
-   *
-   *  Registeres a callback handler that is invoked before middlewares and route match callback.
-   *
-   *  @param callable $routeBeforeCallback
-   *
-   *  @return self
-   */
-  public function before(Callable $routeBeforeCallback):self {
+	/**
+	 *  before
+	 *
+	 *  Registeres a callback handler that is invoked before middlewares and route match callback.
+	 *
+	 *  @param callable $routeBeforeCallback
+	 *
+	 *  @return self
+	 */
+	public function before(Callable $routeBeforeCallback):self {
 
-    $this->beforeCallback = $routeBeforeCallback;
+		$this->beforeCallback = $routeBeforeCallback;
 
-    return $this;
+		return $this;
 
-  }
+	}
 
-  /**
-   *  invokeBeforeCallback
-   *
-   *  Invokes a "before" callback, which may manipulate request object, and response string.
-   *
-   *  @param mixed $request
-   *  @param string $response
-   *
-   *  @return array
-   */
-  protected function invokeBeforeCallback($request, String $response):Array {
+	/**
+	 *  invokeBeforeCallback
+	 *
+	 *  Invokes a "before" callback, which may manipulate request object, and response string.
+	 *
+	 *  @param mixed $request
+	 *  @param string $response
+	 *
+	 *  @return array
+	 */
+	protected function invokeBeforeCallback($request, String $response):Array {
 
-    if(is_callable($this->beforeCallback) === true) {
+		if(is_callable($this->beforeCallback) === true) {
 
-      list($request, $response) = call_user_func_array($this->beforeCallback, [$request, $response]);
+			list($request, $response) = call_user_func_array($this->beforeCallback, [$request, $response]);
 
-    }
+		}
 
-    return [$request, $response];
+		return [$request, $response];
 
-  }
+	}
 
-  /**
-   *  removeBeforeCallback
-   *
-   *  Removes before callback handler.
-   *
-   *  @return void
-   */
-  public function removeBeforeCallback() {
+	/**
+	 *  removeBeforeCallback
+	 *
+	 *  Removes before callback handler.
+	 *
+	 *  @return void
+	 */
+	public function removeBeforeCallback() {
 
-    $this->beforeCallback = null;
+		$this->beforeCallback = null;
 
-  }
+	}
 
-  /**
-   *  after
-   *
-   *  Registeres a callback handler that is invoked after middlewares and route match callback.
-   *
-   *  @param callable $routeAfterCallback
-   *
-   *  @return self
-   */
-  public function after(Callable $routeAfterCallback):self {
+	/**
+	 *  after
+	 *
+	 *  Registeres a callback handler that is invoked after middlewares and route match callback.
+	 *
+	 *  @param callable $routeAfterCallback
+	 *
+	 *  @return self
+	 */
+	public function after(Callable $routeAfterCallback):self {
 
-    $this->afterCallback = $routeAfterCallback;
+		$this->afterCallback = $routeAfterCallback;
 
-    return $this;
+		return $this;
 
-  }
+	}
 
-  /**
-   *  invokeAfterCallback
-   *
-   *  Invokes a "after" callback, which may manipulate request object, and response string.
-   *
-   *  @param mixed $request
-   *  @param string $response
-   *
-   *  @return array
-   */
-  protected function invokeAfterCallback($request, String $response):Array {
+	/**
+	 *  invokeAfterCallback
+	 *
+	 *  Invokes a "after" callback, which may manipulate request object, and response string.
+	 *
+	 *  @param mixed $request
+	 *  @param string $response
+	 *
+	 *  @return array
+	 */
+	protected function invokeAfterCallback($request, String $response):Array {
 
-    if(is_callable($this->afterCallback) === true) {
+		if(is_callable($this->afterCallback) === true) {
 
-      list($request, $response) = call_user_func_array($this->afterCallback, [$request, $response]);
+			list($request, $response) = call_user_func_array($this->afterCallback, [$request, $response]);
 
-    }
+		}
 
-    return [$request, $response];
+		return [$request, $response];
 
-  }
+	}
 
-  /**
-   *  removeAfterCallback
-   *
-   *  Removes after callback handler.
-   *
-   *  @return void
-   */
-  public function removeAfterCallback() {
+	/**
+	 *  removeAfterCallback
+	 *
+	 *  Removes after callback handler.
+	 *
+	 *  @return void
+	 */
+	public function removeAfterCallback() {
 
-    $this->afterCallback = null;
+		$this->afterCallback = null;
 
-  }
+	}
 
-  /**
-   *  removeBeforeAndAfterCallbacks
-   *
-   *  Removes before and after callback handlers.
-   *
-   *  @return void
-   */
-  public function removeBeforeAndAfterCallbacks() {
+	/**
+	 *  removeBeforeAndAfterCallbacks
+	 *
+	 *  Removes before and after callback handlers.
+	 *
+	 *  @return void
+	 */
+	public function removeBeforeAndAfterCallbacks() {
 
-    $this->removeBeforeCallback();
-    $this->removeAfterCallback();
+		$this->removeBeforeCallback();
+		$this->removeAfterCallback();
 
-  }
+	}
 
-  /**
-   *  parameterExists
-   *
-   *  Validates whether or not route parameter exists.
-   *
-   *  @param string $parameterName
-   *
-   *  @return bool
-   */
-  public function parameterExists(String $parameterName):Bool {
+	/**
+	 *  parameterExists
+	 *
+	 *  Validates whether or not route parameter exists.
+	 *
+	 *  @param string $parameterName
+	 *
+	 *  @return bool
+	 */
+	public function parameterExists(String $parameterName):Bool {
 
-    return array_key_exists($parameterName, $this->parameters);
+		return array_key_exists($parameterName, $this->parameters);
 
-  }
+	}
 
-  /**
-   *  parameterMatches
-   *
-   *  Validates if route parameter matches expected data.
-   *
-   *  @param string $parameterName
-   *  @param mixed $expectedParameterData
-   *
-   *  @return bool
-   */
-  public function parameterMatches(String $parameterName, $expectedParameterData):Bool {
+	/**
+	 *  parameterMatches
+	 *
+	 *  Validates if route parameter matches expected data.
+	 *
+	 *  @param string $parameterName
+	 *  @param mixed $expectedParameterData
+	 *
+	 *  @return bool
+	 */
+	public function parameterMatches(String $parameterName, $expectedParameterData):Bool {
 
-    if($this->parameterExists($parameterName) === true) {
+		if($this->parameterExists($parameterName) === true) {
 
-      return $this->getParameter($parameterName) === $expectedParameterData;
+			return $this->getParameter($parameterName) === $expectedParameterData;
 
-    }
+		}
 
-    return false;
+		return false;
 
-  }
+	}
 
-  /**
-   *  setParameter
-   *
-   *  Sets parameter to route object.
-   *
-   *  @param string $parameterName
-   *  @param mixed $parameterData
-   *
-   *  @return void
-   */
-  public function setParameter(String $parameterName, $parameterData) {
+	/**
+	 *  setParameter
+	 *
+	 *  Sets parameter to route object.
+	 *
+	 *  @param string $parameterName
+	 *  @param mixed $parameterData
+	 *
+	 *  @return void
+	 */
+	public function setParameter(String $parameterName, $parameterData) {
 
-    $this->parameters[$parameterName] = $parameterData;
+		$this->parameters[$parameterName] = $parameterData;
 
-  }
+	}
 
-  /**
-   *  getParameter
-   *
-   *  Returns parameter value (or empty string if it doesn't exist).
-   *
-   *  @param string $parameterName
-   *
-   *  @return string|array
-   */
-  public function getParameter(String $parameterName) {
+	/**
+	 *  getParameter
+	 *
+	 *  Returns parameter value (or empty string if it doesn't exist).
+	 *
+	 *  @param string $parameterName
+	 *
+	 *  @return string|array
+	 */
+	public function getParameter(String $parameterName) {
 
-    $parameterData = $this->parameters[$parameterName] ?? '';
+		$parameterData = $this->parameters[$parameterName] ?? '';
 
-    if(is_array($parameterData) === true && count($parameterData) === 1) {
+		if(is_array($parameterData) === true && count($parameterData) === 1) {
 
-      return $parameterData[0];
+			return $parameterData[0];
 
-    }
+		}
 
-    return $parameterData;
+		return $parameterData;
 
-  }
+	}
 
-  /**
-   *  conditionExists
-   *
-   *  Validates whether or not a route condition exists.
-   *
-   *  @param string $conditionName
-   *
-   *  @return bool
-   */
-  public function conditionExists(String $conditionName):Bool {
+	/**
+	 *  conditionExists
+	 *
+	 *  Validates whether or not a route condition exists.
+	 *
+	 *  @param string $conditionName
+	 *
+	 *  @return bool
+	 */
+	public function conditionExists(String $conditionName):Bool {
 
-    return array_key_exists($conditionName, $this->conditions);
+		return array_key_exists($conditionName, $this->conditions);
 
-  }
+	}
 
-  /**
-   *  setCondition
-   *
-   *  Sets route condition.
-   *
-   *  @param string $conditionName
-   *  @param string $conditionRegex
-   *
-   *  @return void
-   */
-  public function setCondition(String $conditionName, String $conditionRegex) {
+	/**
+	 *  setCondition
+	 *
+	 *  Sets route condition.
+	 *
+	 *  @param string $conditionName
+	 *  @param string $conditionRegex
+	 *
+	 *  @return void
+	 */
+	public function setCondition(String $conditionName, String $conditionRegex) {
 
-    $conditionName = str_replace(':', '', $conditionName);
-    $this->conditions[$conditionName] = $conditionRegex;
+		$conditionName = str_replace(':', '', $conditionName);
+		$this->conditions[$conditionName] = $conditionRegex;
 
-    $this->update();
+		$this->update();
 
-  }
+	}
 
-  /**
-   *  getCondition
-   *
-   *  Returns condition regex (or empty string if it doesn't exist).
-   *
-   *  @param string $conditionName
-   *
-   *  @return string
-   */
-  public function getCondition(String $conditionName):String {
+	/**
+	 *  getCondition
+	 *
+	 *  Returns condition regex (or empty string if it doesn't exist).
+	 *
+	 *  @param string $conditionName
+	 *
+	 *  @return string
+	 */
+	public function getCondition(String $conditionName):String {
 
-    if($this->conditionExists($conditionName) === true) {
+		if($this->conditionExists($conditionName) === true) {
 
-      return $this->conditions[$conditionName] ?: self::ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX;
+			return $this->conditions[$conditionName] ?: self::ROUTE_PATTERN_DEFAULT_CAPTURE_REGEX;
 
-    }
+		}
 
-    return '';
+		return '';
 
-  }
+	}
 
-  /**
-   *  condition
-   *
-   *  Invokes {@see \Cider\Delegation\RoutePath::setCondition} and returns self.
-   *
-   *  @param string $conditionName
-   *  @param string $conditionRegex
-   *
-   *  @return self
-   */
-  public function condition(String $conditionName, String $conditionRegex):self {
+	/**
+	 *  condition
+	 *
+	 *  Invokes {@see \Cider\Delegation\RoutePath::setCondition} and returns self.
+	 *
+	 *  @param string $conditionName
+	 *  @param string $conditionRegex
+	 *
+	 *  @return self
+	 */
+	public function condition(String $conditionName, String $conditionRegex):self {
 
-    $this->setCondition($conditionName, $conditionRegex);
+		$this->setCondition($conditionName, $conditionRegex);
 
-    return $this;
+		return $this;
 
-  }
-
-  /**
-   *  conditions
-   *
-   *  Sets multiple conditions, see {@see \Cider\Delegation\RoutePath::setCondition}.
-   *
-   *  @param array $conditions
-   *
-   *  @return self
-   */
-  public function conditions(Array $conditions):self {
+	}
+
+	/**
+	 *  conditions
+	 *
+	 *  Sets multiple conditions, see {@see \Cider\Delegation\RoutePath::setCondition}.
+	 *
+	 *  @param array $conditions
+	 *
+	 *  @return self
+	 */
+	public function conditions(Array $conditions):self {
 
-    foreach($conditions as $conditionName => $conditionRegex) {
+		foreach($conditions as $conditionName => $conditionRegex) {
 
-      $this->setCondition($conditionName, $conditionRegex);
+			$this->setCondition($conditionName, $conditionRegex);
 
-    }
+		}
 
-    return $this;
+		return $this;
 
-  }
+	}
 
-  /**
-   *  setMaxMiddlewares
-   *
-   *  Sets max route middlewares to each route map item.
-   *
-   *  @param int $maxMiddlewares
-   *
-   *  @return void
-   */
-  public function setMaxMiddlewares(Int $maxMiddlewares) {
+	/**
+	 *  setMaxMiddlewares
+	 *
+	 *  Sets max route middlewares to each route map item.
+	 *
+	 *  @param int $maxMiddlewares
+	 *
+	 *  @return void
+	 */
+	public function setMaxMiddlewares(Int $maxMiddlewares) {
 
-    $this->maxMiddlewares = $maxMiddlewares;
+		$this->maxMiddlewares = $maxMiddlewares;
 
-  }
+	}
 
-  /**
-   *  getMaxMiddlewares
-   *
-   *  Return max event listeners to current context.
-   *
-   *  @return void
-   */
-  public function getMaxMiddlewares():Int {
+	/**
+	 *  getMaxMiddlewares
+	 *
+	 *  Return max event listeners to current context.
+	 *
+	 *  @return void
+	 */
+	public function getMaxMiddlewares():Int {
 
-    return $this->maxMiddlewares;
+		return $this->maxMiddlewares;
 
-  }
+	}
 
-  /**
-   *  getMiddlewares
-   *
-   *  Returns all route middlewares.
-   *
-   *  @return array
-   */
-  public function getMiddlewares():Array {
+	/**
+	 *  getMiddlewares
+	 *
+	 *  Returns all route middlewares.
+	 *
+	 *  @return array
+	 */
+	public function getMiddlewares():Array {
 
-    return $this->middlewares;
+		return $this->middlewares;
 
-  }
+	}
 
-  /**
-   *  removeMiddlewares
-   *
-   *  Removes all middlewares.
-   *
-   *  @return void
-   */
-  public function removeMiddlewares() {
+	/**
+	 *  removeMiddlewares
+	 *
+	 *  Removes all middlewares.
+	 *
+	 *  @return void
+	 */
+	public function removeMiddlewares() {
 
-    $this->middlewares = [];
+		$this->middlewares = [];
 
-  }
+	}
 
-  /**
-   *  middlewareExists
-   *
-   *  Validates whether or not route middleware exists.
-   *
-   *  @param callable $middleware
-   *
-   *  @return bool
-   */
-  public function middlewareExists(Callable $middleware):Bool {
+	/**
+	 *  middlewareExists
+	 *
+	 *  Validates whether or not route middleware exists.
+	 *
+	 *  @param callable $middleware
+	 *
+	 *  @return bool
+	 */
+	public function middlewareExists(Callable $middleware):Bool {
 
-    return in_array($middleware, $this->middlewares);
+		return in_array($middleware, $this->middlewares);
 
-  }
+	}
 
-  /**
-   *  attachMiddleware
-   *
-   *  Attaches middleware if it does not exist and within middleware limit.
-   *
-   *  @param callable $middleware
-   *
-   *  @return void
-   */
-  public function attachMiddleware(Callable $middleware) {
+	/**
+	 *  attachMiddleware
+	 *
+	 *  Attaches middleware if it does not exist and within middleware limit.
+	 *
+	 *  @param callable $middleware
+	 *
+	 *  @return void
+	 */
+	public function attachMiddleware(Callable $middleware) {
 
-    if($this->middlewareExists($middleware) === false && count($this->middlewares) < $this->getMaxMiddlewares()) {
+		if($this->middlewareExists($middleware) === false && count($this->middlewares) < $this->getMaxMiddlewares()) {
 
-      $this->middlewares[] = $middleware;
+			$this->middlewares[] = $middleware;
 
-    }
+		}
 
-  }
+	}
 
-  /**
-   *  removeMiddleware
-   *
-   *  Removes middleware if it exists.
-   *
-   *  @return void
-   */
-  public function removeMiddleware(Callable $middleware) {
+	/**
+	 *  removeMiddleware
+	 *
+	 *  Removes middleware if it exists.
+	 *
+	 *  @return void
+	 */
+	public function removeMiddleware(Callable $middleware) {
 
-    if($this->middlewareExists($middleware) === true) {
+		if($this->middlewareExists($middleware) === true) {
 
-      array_splice($this->middlewares, array_search($middleware, $this->middlewares));
+			array_splice($this->middlewares, array_search($middleware, $this->middlewares));
 
-    }
+		}
 
-  }
+	}
 
-  /**
-   *  middleware
-   *
-   *  Invokes {@see \Cider\Delegation\RoutePath::attachMiddleware} and returns self.
-   *
-   *  @param callable $middleware
-   *
-   *  @return self
-   */
-  public function middleware(Callable $middleware):self {
+	/**
+	 *  middleware
+	 *
+	 *  Invokes {@see \Cider\Delegation\RoutePath::attachMiddleware} and returns self.
+	 *
+	 *  @param callable $middleware
+	 *
+	 *  @return self
+	 */
+	public function middleware(Callable $middleware):self {
 
-    $this->attachMiddleware($middleware);
+		$this->attachMiddleware($middleware);
 
-    return $this;
+		return $this;
 
-  }
+	}
 
-  /**
-   *  middlewares
-   *
-   *  Attaches several middlewares at once, see {@see \Cider\Delegation\RoutePath::attachMiddleware}.
-   *
-   *  @param callable $middleware, ...
-   *
-   *  @return self
-   */
-  public function middlewares(Callable ...$middlewares):self {
+	/**
+	 *  middlewares
+	 *
+	 *  Attaches several middlewares at once, see {@see \Cider\Delegation\RoutePath::attachMiddleware}.
+	 *
+	 *  @param callable $middleware, ...
+	 *
+	 *  @return self
+	 */
+	public function middlewares(Callable ...$middlewares):self {
 
-    foreach($middlewares as $middleware) {
+		foreach($middlewares as $middleware) {
 
-      $this->attachMiddleware($middleware);
+			$this->attachMiddleware($middleware);
 
-    }
+		}
 
-    return $this;
+		return $this;
 
-  }
+	}
 
-  /**
-   *  invokeMiddlewares
-   *
-   *  Invokes and collects return values from route path middlewares.
-   *
-   *  @param mixed $request
-   *  @param string $response
-   *
-   *  @return array
-   */
-  protected function invokeMiddlewares($request, String $response):Array {
+	/**
+	 *  invokeMiddlewares
+	 *
+	 *  Invokes and collects return values from route path middlewares.
+	 *
+	 *  @param mixed $request
+	 *  @param string $response
+	 *
+	 *  @return array
+	 */
+	protected function invokeMiddlewares($request, String $response):Array {
 
-    if(count($this->middlewares) === 0) {
+		if(count($this->middlewares) === 0) {
 
-      return [$request, $response];
+			return [$request, $response];
 
-    }
+		}
 
-    foreach($this->middlewares as $index => $middleware) {
+		foreach($this->middlewares as $index => $middleware) {
 
-      if(array_key_exists($index + 1, $this->middlewares) === true) {
+			if(array_key_exists($index + 1, $this->middlewares) === true) {
 
-        $nextMiddleware = $this->middlewares[$index + 1];
+				$nextMiddleware = $this->middlewares[$index + 1];
 
-      }
+			}
 
-      list($request, $response) = call_user_func_array($middleware, [$request, $response, $nextMiddleware ?? null]);
+			list($request, $response) = call_user_func_array($middleware, [$request, $response, $nextMiddleware ?? null]);
 
-    }
+		}
 
-    return [$request, $response];
+		return [$request, $response];
 
-  }
+	}
 
-  /**
-   *  matches
-   *
-   *  Validates whether or not route matches request URI. Updates route parameters if true.
-   *
-   *  @param string $requestUri
-   *
-   *  @return bool
-   */
-  public function matches(String $requestUri):Bool {
+	/**
+	 *  matches
+	 *
+	 *  Validates whether or not route matches request URI. Updates route parameters if true.
+	 *
+	 *  @param string $requestUri
+	 *
+	 *  @return bool
+	 */
+	public function matches(String $requestUri):Bool {
 
-    if(preg_match($this->routePatternRegex, $requestUri, $requestUriMatches) !== false) {
+		if(preg_match($this->routePatternRegex, $requestUri, $requestUriMatches) !== false) {
 
-      if(count($requestUriMatches) === 0) {
+			if(count($requestUriMatches) === 0) {
 
-        return false;
+				return false;
 
-      }
+			}
 
-      foreach($requestUriMatches as $parameterName => $requestParameter) {
+			foreach($requestUriMatches as $parameterName => $requestParameter) {
 
-        if(is_string($parameterName) === true) {
+				if(is_string($parameterName) === true) {
 
-          if(strpos(self::ROUTE_PATTERN_DELIMITER, $requestParameter) !== -1) {
+					if(strpos(self::ROUTE_PATTERN_DELIMITER, $requestParameter) !== -1) {
 
-            $requestParameter = explode(self::ROUTE_PATTERN_DELIMITER, $requestParameter);
+						$requestParameter = explode(self::ROUTE_PATTERN_DELIMITER, $requestParameter);
 
-          }
+					}
 
-          $this->parameters[$parameterName] = $requestParameter;
+					$this->parameters[$parameterName] = $requestParameter;
 
-        }
+				}
 
-      }
+			}
 
-      return true;
+			return true;
 
-    }
+		}
 
-    return false;
+		return false;
 
-  }
+	}
 
-  /**
-   *  invoke
-   *
-   *  Invokes route hooks, match handler and middlewares.
-   *
-   *  @return string
-   */
-  public function invoke():String {
+	/**
+	 *  invoke
+	 *
+	 *  Invokes route hooks, match handler and middlewares.
+	 *
+	 *  @return string
+	 */
+	public function invoke():String {
 
-    list($request, $response) = $this->invokeBeforeCallback($this, '');
+		list($request, $response) = $this->invokeBeforeCallback($this, '');
 
-    $response .= call_user_func_array($this->matchCallback, array_merge([$request, $response], $this->parameters));
+		$response .= call_user_func_array($this->matchCallback, array_merge([$request, $response], $this->parameters));
 
-    if(count($this->middlewares) > 0) {
+		if(count($this->middlewares) > 0) {
 
-      list($request, $response) = $this->invokeMiddlewares($request, $response);
+			list($request, $response) = $this->invokeMiddlewares($request, $response);
 
-    }
+		}
 
-    list($request, $response) = $this->invokeAfterCallback($request, $response ?? '');
+		list($request, $response) = $this->invokeAfterCallback($request, $response ?? '');
 
-    return $response;
+		return $response;
 
-  }
+	}
 
 }

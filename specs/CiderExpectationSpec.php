@@ -7,72 +7,72 @@ use stdClass as DummyClassObject;
 
 describe('Cider\Spec\Expectation', function() {
 
-  it('expects equal', function() {
+	it('expects equal', function() {
 
-    return expect(true)->toEqual(true);
+		return expect(true)->toEqual(true);
 
-  });
+	});
 
-  it('expects not equal', function() {
+	it('expects not equal', function() {
 
-    return expect(true)->notToEqual(false);
+		return expect(true)->notToEqual(false);
 
-  });
+	});
 
-  it('expects equal any', function() {
+	it('expects equal any', function() {
 
-    return expect('foo')->toEqualAny('baz', 'bar', 'foo');
+		return expect('foo')->toEqualAny('baz', 'bar', 'foo');
 
-  });
+	});
 
-  it('expects not equal any', function() {
+	it('expects not equal any', function() {
 
-    return expect('git')->notToEqualAny('php', 'ruby', 'js');
+		return expect('git')->notToEqualAny('php', 'ruby', 'js');
 
-  });
+	});
 
-  it('expects equal all', function() {
+	it('expects equal all', function() {
 
-    return expect('nom')->toEqualAll('nom', 'nom', 'nom');
+		return expect('nom')->toEqualAll('nom', 'nom', 'nom');
 
-  });
+	});
 
-  it('expects not equal all', function() {
+	it('expects not equal all', function() {
 
-    return expect('batman')->notToEqualAll('na', 'na', 'na');
+		return expect('batman')->notToEqualAll('na', 'na', 'na');
 
-  });
+	});
 
-  it('expects truthy', function() {
+	it('expects truthy', function() {
 
-    return expect(1)->toBeTruthy();
+		return expect(1)->toBeTruthy();
 
-  });
+	});
 
-  it('expects falsy', function() {
+	it('expects falsy', function() {
 
-    return expect(null)->toBeFalsy();
+		return expect(null)->toBeFalsy();
 
-  });
+	});
 
-  it('expects satisfy is_string', function() {
+	it('expects satisfy is_string', function() {
 
-    return expect('Hello World')->toSatisfy('is_string');
+		return expect('Hello World')->toSatisfy('is_string');
 
-  });
+	});
 
-  it('expects instance of stdClass', function() {
+	it('expects instance of stdClass', function() {
 
-    $dummyObject = new DummyClassObject;
+		$dummyObject = new DummyClassObject;
 
-    return expect($dummyObject)->instanceOf('stdClass');
+		return expect($dummyObject)->instanceOf('stdClass');
 
-  });
+	});
 
-  it('expects type of string', function() {
+	it('expects type of string', function() {
 
-    return expect('Hiya!')->typeOf('string');
+		return expect('Hiya!')->typeOf('string');
 
-  });
+	});
 
 });

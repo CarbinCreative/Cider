@@ -49,7 +49,7 @@ ini_set('display_errors', false);
 
 set_error_handler(function($severity, $error, $file, $fileLine) {
 
-  throw new \ErrorException($error, $severity, 0, $file, $fileLine);
+	throw new \ErrorException($error, $severity, 0, $file, $fileLine);
 
 });
 
@@ -66,7 +66,7 @@ set_error_handler(function($severity, $error, $file, $fileLine) {
  */
 function send(String $data, String $prefix = null, String $suffix = null) {
 
-  fputs(STDOUT, implode([$prefix, trim($data, "\n"), "\n", $suffix]));
+	fputs(STDOUT, implode([$prefix, trim($data, "\n"), "\n", $suffix]));
 
 }
 
@@ -79,7 +79,7 @@ function send(String $data, String $prefix = null, String $suffix = null) {
  */
 function fetch(Int $streamLength = 1024):String {
 
-  return trim(fgets(STDIN, $streamLength), "\n");
+	return trim(fgets(STDIN, $streamLength), "\n");
 
 }
 
@@ -94,9 +94,9 @@ function fetch(Int $streamLength = 1024):String {
  */
 function argv(Int $argumentIndex = 1):String {
 
-  global $argv;
+	global $argv;
 
-  return $argv[$argumentIndex];
+	return $argv[$argumentIndex];
 
 }
 
@@ -110,7 +110,7 @@ function argv(Int $argumentIndex = 1):String {
  */
 function tell(String $message, ...$replacements) {
 
-  send(sprintf("\033[\033[1;36mCider\033[0m: %s", sprintf($message, ...$replacements)));
+	send(sprintf("\033[\033[1;36mCider\033[0m: %s", sprintf($message, ...$replacements)));
 
 }
 
@@ -130,103 +130,103 @@ require_once CIDER_ROOT_PATH . 'src/vendor/Cider/functions.php';
 
 try {
 
-  $command = argv();
+	$command = argv();
 
-  switch($command) {
+	switch($command) {
 
-    case 'test' :
+		case 'test' :
 
-      $numTests = \Cider\import('*', 'specs');
+			$numTests = \Cider\import('*', 'specs');
 
-      tell('Waiting for %d tests...', $numTests);
+			tell('Waiting for %d tests...', $numTests);
 
-      \Cider\Spec\Runner::runAll();
+			\Cider\Spec\Runner::runAll();
 
-      $specReport = (object) \Cider\Spec\Runner::report();
+			$specReport = (object) \Cider\Spec\Runner::report();
 
-      foreach($specReport->specs as $specDescription => $specTestReport) {
+			foreach($specReport->specs as $specDescription => $specTestReport) {
 
-        $specTestReport = (object) $specTestReport;
+				$specTestReport = (object) $specTestReport;
 
-        if($specTestReport->skipped === true) {
+				if($specTestReport->skipped === true) {
 
-          $specDescriptionTitle = sprintf("  [\033[\033[1;34m%s\033[0m] Spec %s", 'SKIP', $specDescription);
+					$specDescriptionTitle = sprintf("  [\033[\033[1;34m%s\033[0m] Spec %s", 'SKIP', $specDescription);
 
-        } else if($specTestReport->passed === true) {
+				} else if($specTestReport->passed === true) {
 
-          $specDescriptionTitle = sprintf("  [\033[\033[1;32m%s\033[0m] Spec %s", 'PASS', $specDescription);
+					$specDescriptionTitle = sprintf("  [\033[\033[1;32m%s\033[0m] Spec %s", 'PASS', $specDescription);
 
-        } if($specTestReport->failed === true) {
+				} if($specTestReport->failed === true) {
 
-          $specDescriptionTitle = sprintf("  [\033[\033[1;31m%s\033[0m] Spec %s", 'FAIL', $specDescription);
+					$specDescriptionTitle = sprintf("  [\033[\033[1;31m%s\033[0m] Spec %s", 'FAIL', $specDescription);
 
-        }
+				}
 
-        $specDescriptionTitle .= sprintf(" (\033[\033[1;33m%s\033[0m seconds)", round($specTestReport->timeElapsed, 6));
+				$specDescriptionTitle .= sprintf(" (\033[\033[1;33m%s\033[0m seconds)", round($specTestReport->timeElapsed, 6));
 
-        send($specDescriptionTitle, "\n", "\n");
+				send($specDescriptionTitle, "\n", "\n");
 
-        foreach($specTestReport->tests as $testReport) {
+				foreach($specTestReport->tests as $testReport) {
 
-          list($testState, $testDescription) = $testReport;
+					list($testState, $testDescription) = $testReport;
 
-          switch(strtolower($testState)) {
+					switch(strtolower($testState)) {
 
-            case 'pass' :
+						case 'pass' :
 
-              send(sprintf("    \033[\033[1;32m%s\033[0m  %s", '✔', $testDescription));
+							send(sprintf("    \033[\033[1;32m%s\033[0m  %s", '✔', $testDescription));
 
-            break;
-            case 'fail' :
+						break;
+						case 'fail' :
 
-              send(sprintf("    \033[\033[1;31m%s\033[0m  %s", '✘', $testDescription));
+							send(sprintf("    \033[\033[1;31m%s\033[0m  %s", '✘', $testDescription));
 
-            break;
-            case 'skip' :
+						break;
+						case 'skip' :
 
-              send(sprintf("    \033[\033[1;34m%s\033[0m  %s", '▸', $testDescription));
+							send(sprintf("    \033[\033[1;34m%s\033[0m  %s", '▸', $testDescription));
 
-            break;
+						break;
 
-          }
+					}
 
-        }
+				}
 
-        send("");
+				send("");
 
-      }
+			}
 
-      $numPassed = sprintf("\033[\033[1;32m%d\033[0m %s", $specReport->numPassed, 'passed');
-      $numFailed = sprintf("\033[\033[1;31m%d\033[0m %s", $specReport->numFailed, 'failed');
-      $numSkipped = sprintf("\033[\033[1;34m%d\033[0m %s", $specReport->numSkipped, 'skipped');
+			$numPassed = sprintf("\033[\033[1;32m%d\033[0m %s", $specReport->numPassed, 'passed');
+			$numFailed = sprintf("\033[\033[1;31m%d\033[0m %s", $specReport->numFailed, 'failed');
+			$numSkipped = sprintf("\033[\033[1;34m%d\033[0m %s", $specReport->numSkipped, 'skipped');
 
-      $allTestsPassed = ($specReport->numFailed === 0);
+			$allTestsPassed = ($specReport->numFailed === 0);
 
-      tell(sprintf("Ran a total of %d specs, ", $numTests) . implode(', ', [$numPassed, $numFailed, $numSkipped]));
-      tell(sprintf("Runner finished in \033[\033[1;33m%s\033[0m seconds.", round($specReport->timeElapsed, 6)));
+			tell(sprintf("Ran a total of %d specs, ", $numTests) . implode(', ', [$numPassed, $numFailed, $numSkipped]));
+			tell(sprintf("Runner finished in \033[\033[1;33m%s\033[0m seconds.", round($specReport->timeElapsed, 6)));
 
-    break;
+		break;
 
-  }
+	}
 
 } catch(\Exception $exception) {
 
-  tell("Spec runner exited due to exception thrown.");
-  send(sprintf("  ⌊  \033[\033[1;31m%s\033[0m: %s (%s:%d)", get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
-  exit;
+	tell("Spec runner exited due to exception thrown.");
+	send(sprintf("  ⌊  \033[\033[1;31m%s\033[0m: %s (%s:%d)", get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+	exit;
 
 } finally {
 
-  if($allTestsPassed === true) {
+	if($allTestsPassed === true) {
 
-    tell("Spec suite \033[\033[1;32mpassed\033[0m, all tests are OK.");
+		tell("Spec suite \033[\033[1;32mpassed\033[0m, all tests are OK.");
 
-  } else {
+	} else {
 
-    tell("Spec suite \033[\033[1;31mfailed\033[0m, at least one test failed.");
+		tell("Spec suite \033[\033[1;31mfailed\033[0m, at least one test failed.");
 
-  }
+	}
 
-  exit;
+	exit;
 
 }

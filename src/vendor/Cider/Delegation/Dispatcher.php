@@ -32,140 +32,140 @@ use Cider\Exceptions\FrameworkException;
  */
 class Dispatcher {
 
-  /* @mixins */
-  use \Cider\Event\Emitter;
+	/* @mixins */
+	use \Cider\Event\Emitter;
 
-  /**
-   *  @var \Cider\Http\Client $httpClient
-   */
-  protected $httpClient;
+	/**
+	 *  @var \Cider\Http\Client $httpClient
+	 */
+	protected $httpClient;
 
-  /**
-   *  @var \Cider\Delegation\RouteMap $routeMap
-   */
-  protected $routeMap;
+	/**
+	 *  @var \Cider\Delegation\RouteMap $routeMap
+	 */
+	protected $routeMap;
 
-  /**
-   *  Constructor
-   *
-   *  Sets Http client and route maps instances.
-   *
-   *  @param \Cider\Http\Client $httpClient
-   *  @param \Cider\Delegation\RouteMap $routeMap
-   *
-   *  @return void
-   */
-  public function __construct(HttpClient $httpClient, RouteMap $routeMap) {
+	/**
+	 *  Constructor
+	 *
+	 *  Sets Http client and route maps instances.
+	 *
+	 *  @param \Cider\Http\Client $httpClient
+	 *  @param \Cider\Delegation\RouteMap $routeMap
+	 *
+	 *  @return void
+	 */
+	public function __construct(HttpClient $httpClient, RouteMap $routeMap) {
 
-    $this->httpClient = $httpClient;
+		$this->httpClient = $httpClient;
 
-    $this->routeMap = $routeMap;
+		$this->routeMap = $routeMap;
 
-  }
+	}
 
-  /**
-   *  requestMethod
-   *
-   *  Returns current request method.
-   *
-   *  @return string
-   */
-  protected function requestMethod():String {
+	/**
+	 *  requestMethod
+	 *
+	 *  Returns current request method.
+	 *
+	 *  @return string
+	 */
+	protected function requestMethod():String {
 
-    return $this->httpClient->getRequestMethod();
+		return $this->httpClient->getRequestMethod();
 
-  }
+	}
 
-  /**
-   *  routePaths
-   *
-   *  Returns all registered route paths.
-   *
-   *  @return array
-   */
-  protected function routePaths():Array {
+	/**
+	 *  routePaths
+	 *
+	 *  Returns all registered route paths.
+	 *
+	 *  @return array
+	 */
+	protected function routePaths():Array {
 
-    return $this->routeMap->paths();
+		return $this->routeMap->paths();
 
-  }
+	}
 
-  /**
-   *  dispatch
-   *
-   *  Invokes route path if a match is found.
-   *
-   *  @param string $requestUri
-   *
-   *  @emits "dispatching"
-   *  @emits "dispatched"
-   *  @emits "missingRoute"
-   *
-   *  @return string
-   */
-  public function dispatch(String $requestUri):String {
+	/**
+	 *  dispatch
+	 *
+	 *  Invokes route path if a match is found.
+	 *
+	 *  @param string $requestUri
+	 *
+	 *  @emits "dispatching"
+	 *  @emits "dispatched"
+	 *  @emits "missingRoute"
+	 *
+	 *  @return string
+	 */
+	public function dispatch(String $requestUri):String {
 
-    $requestMethod = $this->requestMethod();
+		$requestMethod = $this->requestMethod();
 
-    $routePaths = $this->routePaths();
+		$routePaths = $this->routePaths();
 
-    $foundMatch = false;
+		$foundMatch = false;
 
-    $this->emit('dispatching');
+		$this->emit('dispatching');
 
-    foreach($routePaths as $routePathPattern => $routeMethodPaths) {
+		foreach($routePaths as $routePathPattern => $routeMethodPaths) {
 
-      if(array_key_exists($requestMethod, $routeMethodPaths) === true) {
+			if(array_key_exists($requestMethod, $routeMethodPaths) === true) {
 
-        $routePath = $routeMethodPaths[$requestMethod];
+				$routePath = $routeMethodPaths[$requestMethod];
 
-        if($routePath->matches($requestUri) === true) {
+				if($routePath->matches($requestUri) === true) {
 
-          $response = $routePath->invoke();
+					$response = $routePath->invoke();
 
-          $foundMatch = true;
+					$foundMatch = true;
 
-          break;
+					break;
 
-        }
+				}
 
-      }
+			}
 
-    }
+		}
 
-    if($foundMatch === false) {
+		if($foundMatch === false) {
 
-      $this->emit('missingRoute');
+			$this->emit('missingRoute');
 
-      $this->httpClient->send(404);
+			$this->httpClient->send(404);
 
-      return $this->routeMap->handleMissingRoute();
+			return $this->routeMap->handleMissingRoute();
 
-    }
+		}
 
-    $this->emit('dispatched');
+		$this->emit('dispatched');
 
-    return $response ?? '';
+		return $response ?? '';
 
-  }
+	}
 
-  /**
-   *  dispatchError
-   *
-   *  Dispatches error route.
-   *
-   *  @param Cider\Exceptions\FrameworkException $exception
-   *  @param int $errorStatusCode
-   *
-   *  @return string
-   */
-  public function dispatchError(FrameworkException $exception, Int $errorStatusCode = 500):String {
+	/**
+	 *  dispatchError
+	 *
+	 *  Dispatches error route.
+	 *
+	 *  @param Cider\Exceptions\FrameworkException $exception
+	 *  @param int $errorStatusCode
+	 *
+	 *  @return string
+	 */
+	public function dispatchError(FrameworkException $exception, Int $errorStatusCode = 500):String {
 
-    $this->emit('errorRoute');
+		$this->emit('errorRoute');
 
-    $this->httpClient->send($errorStatusCode);
+		$this->httpClient->send($errorStatusCode);
 
-    return $this->routeMap->handleErrorRoute();
+		return $this->routeMap->handleErrorRoute();
 
-  }
+	}
 
 }

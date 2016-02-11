@@ -26,12 +26,12 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  */
 function describe(String $specDescription, Callable $specContainer) {
 
-  $spec = new Spec;
-  $spec->describe($specDescription);
+	$spec = new Spec;
+	$spec->describe($specDescription);
 
-  Runner::register($spec);
+	Runner::register($spec);
 
-  return Runner::describe($specDescription, $specContainer);
+	return Runner::describe($specDescription, $specContainer);
 
 }
 
@@ -47,7 +47,7 @@ function describe(String $specDescription, Callable $specContainer) {
  */
 function it(String $testDescription, Callable $testContainer) {
 
-  return Runner::it($testDescription, $testContainer);
+	return Runner::it($testDescription, $testContainer);
 
 }
 
@@ -62,7 +62,7 @@ function it(String $testDescription, Callable $testContainer) {
  */
 function before(Callable $beforeCallback) {
 
-  Runner::before($beforeCallback);
+	Runner::before($beforeCallback);
 
 }
 
@@ -77,7 +77,7 @@ function before(Callable $beforeCallback) {
  */
 function after(Callable $afterCallback) {
 
-  Runner::after($afterCallback);
+	Runner::after($afterCallback);
 
 }
 
@@ -92,7 +92,7 @@ function after(Callable $afterCallback) {
  */
 function beforeEach(Callable $beforeEachCallback) {
 
-  Runner::beforeEach($beforeEachCallback);
+	Runner::beforeEach($beforeEachCallback);
 
 }
 
@@ -107,6 +107,6 @@ function beforeEach(Callable $beforeEachCallback) {
  */
 function afterEach(Callable $afterEachCallback) {
 
-  Runner::afterEach($afterEachCallback);
+	Runner::afterEach($afterEachCallback);
 
 }

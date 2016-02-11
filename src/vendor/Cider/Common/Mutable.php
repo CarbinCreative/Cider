@@ -31,213 +31,213 @@ use Closure;
  */
 trait Mutable {
 
-  /**
-   *  @var array $__store
-   */
-  protected $__store = [];
+	/**
+	 *  @var array $__store
+	 */
+	protected $__store = [];
 
-  /**
-   *  @var array $setterCallbacks
-   */
-  protected $setterCallbacks = [];
+	/**
+	 *  @var array $setterCallbacks
+	 */
+	protected $setterCallbacks = [];
 
-  /**
-   *  @var array $getterCallbacks
-   */
-  protected $getterCallbacks = [];
+	/**
+	 *  @var array $getterCallbacks
+	 */
+	protected $getterCallbacks = [];
 
-  /**
-   *  hasSetter
-   *
-   *  Validates whether or not a property has a setter callback.
-   *
-   *  @param string $storeKey
-   *
-   *  @return bool
-   */
-  public function hasSetter(String $storeKey):Bool {
+	/**
+	 *  hasSetter
+	 *
+	 *  Validates whether or not a property has a setter callback.
+	 *
+	 *  @param string $storeKey
+	 *
+	 *  @return bool
+	 */
+	public function hasSetter(String $storeKey):Bool {
 
-    return array_key_exists($storeKey, $this->setterCallbacks);
+		return array_key_exists($storeKey, $this->setterCallbacks);
 
-  }
+	}
 
-  /**
-   *  registerSetter
-   *
-   *  Registerers a setter callback.
-   *
-   *  @param string $storeKey
-   *  @param callable $setterCallback
-   *
-   *  @return void
-   */
-  public function registerSetter(String $storeKey, Callable $setterCallback) {
+	/**
+	 *  registerSetter
+	 *
+	 *  Registerers a setter callback.
+	 *
+	 *  @param string $storeKey
+	 *  @param callable $setterCallback
+	 *
+	 *  @return void
+	 */
+	public function registerSetter(String $storeKey, Callable $setterCallback) {
 
-    $this->setterCallbacks[$storeKey] = $setterCallback;
+		$this->setterCallbacks[$storeKey] = $setterCallback;
 
-  }
+	}
 
-  /**
-   *  unregisterSetter
-   *
-   *  Removes a registered setter callback.
-   *
-   *  @param string $storeKey
-   *
-   *  @return void
-   */
-  public function unregisterSetter(String $storeKey) {
+	/**
+	 *  unregisterSetter
+	 *
+	 *  Removes a registered setter callback.
+	 *
+	 *  @param string $storeKey
+	 *
+	 *  @return void
+	 */
+	public function unregisterSetter(String $storeKey) {
 
-    if($this->hasSetter($storeKey) === true) {
+		if($this->hasSetter($storeKey) === true) {
 
-      unset($this->setterCallbacks[$storeKey]);
+			unset($this->setterCallbacks[$storeKey]);
 
-    }
+		}
 
-  }
+	}
 
-  /**
-   *  hasGetter
-   *
-   *  Validates whether or not a property has a getter callback.
-   *
-   *  @param string $storeKey
-   *
-   *  @return bool
-   */
-  public function hasGetter(String $storeKey):Bool {
+	/**
+	 *  hasGetter
+	 *
+	 *  Validates whether or not a property has a getter callback.
+	 *
+	 *  @param string $storeKey
+	 *
+	 *  @return bool
+	 */
+	public function hasGetter(String $storeKey):Bool {
 
-    return array_key_exists($storeKey, $this->getterCallbacks);
+		return array_key_exists($storeKey, $this->getterCallbacks);
 
-  }
+	}
 
-  /**
-   *  registerGetter
-   *
-   *  Registerers a getter callback.
-   *
-   *  @param string $storeKey
-   *  @param callable $getterCallback
-   *
-   *  @return void
-   */
-  public function registerGetter(String $storeKey, Callable $getterCallback) {
+	/**
+	 *  registerGetter
+	 *
+	 *  Registerers a getter callback.
+	 *
+	 *  @param string $storeKey
+	 *  @param callable $getterCallback
+	 *
+	 *  @return void
+	 */
+	public function registerGetter(String $storeKey, Callable $getterCallback) {
 
-    $this->getterCallbacks[$storeKey] = $getterCallback;
+		$this->getterCallbacks[$storeKey] = $getterCallback;
 
-  }
+	}
 
-  /**
-   *  unregisterGetter
-   *
-   *  Removes a registered setter callback.
-   *
-   *  @param string $storeKey
-   *
-   *  @return void
-   */
-  public function unregisterGetter(String $storeKey) {
+	/**
+	 *  unregisterGetter
+	 *
+	 *  Removes a registered setter callback.
+	 *
+	 *  @param string $storeKey
+	 *
+	 *  @return void
+	 */
+	public function unregisterGetter(String $storeKey) {
 
-    if($this->hasGetter($storeKey) === true) {
+		if($this->hasGetter($storeKey) === true) {
 
-      unset($this->getterCallbacks[$storeKey]);
+			unset($this->getterCallbacks[$storeKey]);
 
-    }
+		}
 
-  }
+	}
 
-  /**
-   *  set
-   *
-   *  Sets store value using setter if present, otherwise sets value by mutating data store.
-   *
-   *  @param string $storeKey
-   *  @param mixed $mixedValue
-   *
-   *  @return void
-   */
-  public function set(String $storeKey, $mixedValue) {
+	/**
+	 *  set
+	 *
+	 *  Sets store value using setter if present, otherwise sets value by mutating data store.
+	 *
+	 *  @param string $storeKey
+	 *  @param mixed $mixedValue
+	 *
+	 *  @return void
+	 */
+	public function set(String $storeKey, $mixedValue) {
 
-    if($storeKey === '__store') {
+		if($storeKey === '__store') {
 
-      $this->__store = $mixedValue;
+			$this->__store = $mixedValue;
 
-    } else if($this->hasSetter($storeKey) === true) {
+		} else if($this->hasSetter($storeKey) === true) {
 
-      $setterCallback = $this->setterCallbacks[$storeKey];
+			$setterCallback = $this->setterCallbacks[$storeKey];
 
-      $boundSetterCallback = Closure::bind($setterCallback, $this);
+			$boundSetterCallback = Closure::bind($setterCallback, $this);
 
-      $boundSetterCallback($mixedValue);
+			$boundSetterCallback($mixedValue);
 
-    } else {
+		} else {
 
-      $this->__store[$storeKey] = $mixedValue;
+			$this->__store[$storeKey] = $mixedValue;
 
-    }
+		}
 
-  }
+	}
 
-  /**
-   *  __set
-   *
-   *  Invokes {@see \Cider\Common\Mutable::set}.
-   *
-   *  @param string $storeKey
-   *  @param mixed $mixedValue
-   *
-   *  @return void
-   */
-  public function __set(String $storeKey, $mixedValue) {
+	/**
+	 *  __set
+	 *
+	 *  Invokes {@see \Cider\Common\Mutable::set}.
+	 *
+	 *  @param string $storeKey
+	 *  @param mixed $mixedValue
+	 *
+	 *  @return void
+	 */
+	public function __set(String $storeKey, $mixedValue) {
 
-    $this->set($storeKey, $mixedValue);
+		$this->set($storeKey, $mixedValue);
 
-  }
+	}
 
-  /**
-   *  set
-   *
-   *  Gets store value using getter if present, otherwise returns value from data store.
-   *
-   *  @param string $storeKey
-   *
-   *  @return void
-   */
-  public function get(String $storeKey) {
+	/**
+	 *  set
+	 *
+	 *  Gets store value using getter if present, otherwise returns value from data store.
+	 *
+	 *  @param string $storeKey
+	 *
+	 *  @return void
+	 */
+	public function get(String $storeKey) {
 
-    if($storeKey === '__store') {
+		if($storeKey === '__store') {
 
-      return $this->__store;
+			return $this->__store;
 
-    } else if($this->hasGetter($storeKey) === true) {
+		} else if($this->hasGetter($storeKey) === true) {
 
-      $getterCallback = $this->getterCallbacks[$storeKey];
+			$getterCallback = $this->getterCallbacks[$storeKey];
 
-      $boundGetterCallback = Closure::bind($getterCallback, $this);
+			$boundGetterCallback = Closure::bind($getterCallback, $this);
 
-      return $boundGetterCallback($storeKey);
+			return $boundGetterCallback($storeKey);
 
-    } else {
+		} else {
 
-      return $this->__store[$storeKey] ?? null;
+			return $this->__store[$storeKey] ?? null;
 
-    }
+		}
 
-  }
+	}
 
-  /**
-   *  __set
-   *
-   *  Invokes {@see \Cider\Common\Mutable::get}.
-   *
-   *  @param string $storeKey
-   *
-   *  @return mixed
-   */
-  public function __get(String $storeKey) {
+	/**
+	 *  __set
+	 *
+	 *  Invokes {@see \Cider\Common\Mutable::get}.
+	 *
+	 *  @param string $storeKey
+	 *
+	 *  @return mixed
+	 */
+	public function __get(String $storeKey) {
 
-    return $this->get($storeKey);
+		return $this->get($storeKey);
 
-  }
+	}
 
 }
