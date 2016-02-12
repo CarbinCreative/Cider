@@ -120,7 +120,17 @@ class Dispatcher {
 
 				if($routePath->matches($requestUri) === true) {
 
-					$response = $routePath->invoke();
+					list($request, $response) = $this->routeMap->invokeBeforeCallback($this->httpClient, '');
+
+					if(count($this->routeMap->getMiddlewares()) > 0) {
+
+						list($request, $response) = $this->routeMap->invokeMiddlewares($request, $response);
+
+					}
+
+					$response = $routePath->invoke($response);
+
+					list($request, $response) = $this->routeMap->invokeAfterCallback($request, $response ?? '');
 
 					$foundMatch = true;
 

@@ -15,9 +15,9 @@ namespace Cider\Delegation;
 if(!defined('CIDER_ROOT_PATH')) exit;
 
 /* @imports */
-use \Cider\Exception\OverflowException;
-use \Cider\Exception\InvalidArgumentException;
-use \Cider\Route\Exception\RouteAlreadyDefinedException;
+use Exceptions\RouteAlreadyDefinedException;
+use Exceptions\RouteNotFoundException;
+use Exceptions\RouteException;
 
 /**
  *  RouteMap
@@ -32,6 +32,9 @@ use \Cider\Route\Exception\RouteAlreadyDefinedException;
  *  @author Carbin Creative <hej@carbin.se>
  */
 class RouteMap {
+
+	/* @mixins */
+	use Hookable;
 
 	/**
 	 *  @const string REQUEST_METHOD_DELIMITER
@@ -531,6 +534,8 @@ class RouteMap {
 	 *
 	 *  Invokes missing route callback handler.
 	 *
+	 *	@throws Cider\Delegation\Exceptions\RouteNotFoundException
+	 *
 	 *  @return string
 	 */
 	public function handleMissingRoute():String {
@@ -541,7 +546,7 @@ class RouteMap {
 
 		}
 
-		return '404 Not Found';
+		throw new RouteNotFoundException;
 
 	}
 
@@ -567,6 +572,8 @@ class RouteMap {
 	 *
 	 *  Invokes missing route callback handler.
 	 *
+	 *	@throws Cider\Delegation\Exceptions\RouteException
+	 *
 	 *  @return string
 	 */
 	public function handleErrorRoute():String {
@@ -577,7 +584,7 @@ class RouteMap {
 
 		}
 
-		return '500 Internal Server Error';
+		throw new RouteException;
 
 	}
 
