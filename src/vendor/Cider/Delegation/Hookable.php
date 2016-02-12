@@ -14,10 +14,6 @@ namespace Cider\Delegation;
 /* Deny direct file access */
 if(!defined('CIDER_ROOT_PATH')) exit;
 
-/* @imports */
-use Cider\Http\Client as HttpClient;
-use Cider\Exceptions\FrameworkException;
-
 /**
  *  Hookable
  *

@@ -5,6 +5,7 @@ namespace Cider\Spec;
 use function \Cider\import;
 use function \Cider\expect;
 
+import('Cider\Delegation\Hookable');
 import('Cider\Delegation\RoutePath');
 
 describe('Cider\Delegation\RoutePath', function() {
