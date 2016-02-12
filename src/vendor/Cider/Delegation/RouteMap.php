@@ -25,7 +25,7 @@ use Exceptions\RouteException;
  *  Route map handler.
  *
  *  @vendor Cider
- *  @package Route
+ *  @package Delegation
  *
  *  @version 1.0.0
  *

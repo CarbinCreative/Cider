@@ -23,7 +23,8 @@ use Cider\Exceptions\FrameworkException;
  *  Generic route exception.
  *
  *  @vendor Cider
- *  @package Exceptions
+ *  @package Delegation
+ *  @subpackage Exceptions
  *
  *  @version 1.0.0
  *

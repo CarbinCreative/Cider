@@ -20,7 +20,7 @@ if(!defined('CIDER_ROOT_PATH')) exit;
  *  Hookable trait, adds before, after and middleware functionality.
  *
  *  @vendor Cider
- *  @package Route
+ *  @package Delegation
  *
  *  @version 1.0.0
  *
