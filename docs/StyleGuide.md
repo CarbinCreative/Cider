@@ -25,7 +25,7 @@ This document serves as a guideline for developers contributing and/or using Cid
 ### Case sensitivity
 
 * Variable and function names **MUST** be camel cased. I.e `$variableName`.
-  * `protected` and `private` variables **MAY** use a single underscore as prefix.
+	* `protected` and `private` variables **MAY** use a single underscore as prefix.
 * Classes, Abstracts, Interfaces and Traits **MUST** be camel cased with capital first letter. I.e `ClassName`.
 
 
@@ -47,7 +47,8 @@ function setName(String $firstName, String $lastName):Bool {}
 ### Namespace
 
 * Namespaces **MUST** map file path, including directories.
-* Namespaces _SHOULD_ be in singular form. I.e `Cider\Route\Path`.
+	* `src/vendor` is omitted from namespaces. I.e `Cider\Route\Path` maps `{rootPath}/src/vendor/Cider/Route/Path.php`.
+* Namespaces **SHOULD** be in singular form. I.e `Cider\Route\Path`.
 
 
 ---
@@ -66,7 +67,7 @@ function resolvePathName(String $unresolvedPathName):String {
 }
 ```
 
-#### Bad
+#### Bad 
 
 ```php
 function resolvePathName($unresolvedPathName)
@@ -79,7 +80,7 @@ function resolvePathName($unresolvedPathName)
 
 * Single line statements **MUST NOT** be used, with the exception that _single line return statements_ **MAY** be used.
 
-#### Good
+#### Acceptable
 
 ```php
 function emit(String $eventName, ...$eventCallbackArguments):self {
@@ -87,7 +88,7 @@ function emit(String $eventName, ...$eventCallbackArguments):self {
 }
 ```
 
-#### Bad
+#### Not acceptable
 
 ```php
 function emit(String $eventName, $eventCallbackArguments = null):self {
