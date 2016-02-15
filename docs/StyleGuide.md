@@ -59,7 +59,7 @@ function setName(String $firstName, String $lastName):Bool {}
 * A space **MUST** supersede closing parentheses.
 * Opening bracket **MUST** be on the same row as the function declaration or statement.
 
-#### Good
+#### Acceptable
 
 ```php
 function resolvePathName(String $unresolvedPathName):String {
@@ -67,7 +67,7 @@ function resolvePathName(String $unresolvedPathName):String {
 }
 ```
 
-#### Bad 
+#### Not acceptable
 
 ```php
 function resolvePathName($unresolvedPathName)
@@ -93,5 +93,61 @@ function emit(String $eventName, ...$eventCallbackArguments):self {
 ```php
 function emit(String $eventName, $eventCallbackArguments = null):self {
 	if(is_array($eventCallbackArguments) === false) $eventCallbackArguments = [];
+}
+```
+
+---
+
+
+## Classes, Abstracts, Traits & Interfaces
+
+* All Classes, Abstracts, Traits and Interfaces **MUST** have a documentation header, namespace definition and include namespaces with `use`.
+* Namespaces, including relative namespaces **SHOULD** be defined outside class, trait or interface definition.
+
+#### Class Template
+
+```php
+<?php
+/**
+ *  Cider
+ *
+ *  Cider is a PHP based object oriented nano-framework for building small web applications.
+ *
+ *  @author Carbin Creative <hej@carbin.se>
+ *  @license http://opensource.org/licenses/MIT MIT
+ */
+
+/* @namespace Cider */
+namespace Cider;
+
+/* Deny direct file access */
+if(!defined('CIDER_ROOT_PATH')) exit;
+
+/* @imports */
+use Cider\Common\Singleton;
+use Cider\Common\Mutable;
+use Cider\Common\Factory;
+use Cider\Event\Emitter as EventEmitter;
+
+/**
+ *  Application
+ *
+ *  Cider application class, acts as a registry object holding Cider class instances.
+ *
+ *  @vendor Cider
+ *  @package Core
+ *
+ *  @version 1.0.0
+ *
+ *  @author Carbin Creative <hej@carbin.se>
+ */
+class Application {
+
+	/* @mixins */
+	use Singleton;
+	use Mutable;
+	use Factory;
+	use EventEmitter;
+
 }
 ```
